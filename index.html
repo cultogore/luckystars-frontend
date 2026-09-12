@@ -171,6 +171,7 @@
     .premio-monto.silver { color: #C0C0C0; }
     .premio-monto.bronze { color: #CD7F32; }
     .premio-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .premio-stars { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
     /* PROGRESO */
     .progress-section { margin-bottom: 20px; }
@@ -710,6 +711,7 @@
   if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0D0D1A'); tg.setBackgroundColor('#0D0D1A'); }
 
   const BACKEND = 'https://luckystars-backend.onrender.com';
+  const STARS_PER_USD = 50;
   let cantidad = 1;
   let sorteoData = null;
   let userId = null;
@@ -757,7 +759,7 @@
     document.getElementById('sorteo-titulo').textContent = sorteoData.titulo;
     document.getElementById('stat-vendidos').textContent = sorteoData.vendidos;
     document.getElementById('stat-restantes').textContent = sorteoData.restantes;
-    document.getElementById('stat-precio').textContent = sorteoData.precioPorBoleto + '⭐';
+    document.getElementById('stat-precio').innerHTML = '$' + (sorteoData.precioPorBoleto / 50).toFixed(2) + ' <small style="font-size:10px;color:var(--muted)">' + sorteoData.precioPorBoleto + '⭐</small>';
     document.getElementById('progress-pct').textContent = sorteoData.porcentaje + '%';
     document.getElementById('progress-fill').style.width = sorteoData.porcentaje + '%';
     document.getElementById('progress-vendidos').textContent = sorteoData.vendidos + ' vendidos';
@@ -770,7 +772,8 @@
     grid.innerHTML = sorteoData.premios.map((p, i) => `
       <div class="premio-card ${clases[i]}">
         <div class="premio-emoji">${emojis[i]}</div>
-        <div class="premio-monto ${clases[i]}">${p.monto}⭐</div>
+        <div class="premio-monto ${clases[i]}">$${(p.monto / 50).toFixed(0)} USD</div>
+        <div class="premio-stars">${p.monto} ⭐</div>
         <div class="premio-desc">${p.descripcion}</div>
       </div>
     `).join('');
@@ -785,7 +788,9 @@
 
   function actualizarPrecio() {
     document.getElementById('qty-num').textContent = cantidad;
-    document.getElementById('precio-val').textContent = (cantidad * (sorteoData?.precioPorBoleto || 50)) + ' ⭐';
+    const totalStars = cantidad * (sorteoData?.precioPorBoleto || 50);
+    const totalUsd = (totalStars / 50).toFixed(2);
+    document.getElementById('precio-val').innerHTML = '$' + totalUsd + ' USD <small style="font-size:13px;color:var(--muted)">(' + totalStars + ' ⭐)</small>';
   }
 
   function cambiarCantidad(delta) {
