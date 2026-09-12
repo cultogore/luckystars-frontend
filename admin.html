@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucky Stars — Admin</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --gold: #FFD700;
+      --gold2: #FFA500;
+      --purple: #7C3AED;
+      --purple2: #A855F7;
+      --green: #22c55e;
+      --red: #ef4444;
+      --dark: #0D0D1A;
+      --dark2: #13132A;
+      --dark3: #1A1A35;
+      --card: #16162E;
+      --border: rgba(124,58,237,0.25);
+      --text: #F1F0FF;
+      --muted: #8B85A0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* LOGIN */
+    .login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .login-icon { font-size: 48px; margin-bottom: 16px; }
+    .login-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus { border-color: var(--purple2); }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--purple), var(--purple2));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-danger {
+      padding: 10px 20px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+    .btn-success {
+      padding: 10px 20px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 10px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-success:hover { background: rgba(34,197,94,0.25); }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--purple2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover { background: rgba(124,58,237,0.25); }
+
+    /* ADMIN PANEL */
+    .admin-screen { display: none; }
+
+    .topbar {
+      background: var(--dark2);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-logo { font-size: 20px; font-weight: 800; }
+    .topbar-badge {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: var(--red);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .main-content { padding: 24px; max-width: 1100px; margin: 0 auto; }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+    }
+
+    .stat-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--purple2)); }
+    .stat-card.gold::before { background: linear-gradient(90deg, var(--gold2), var(--gold)); }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.red::before { background: var(--red); }
+
+    .stat-card-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-card-val { font-size: 28px; font-weight: 800; color: var(--text); }
+    .stat-card-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* SECTIONS */
+    .section { margin-bottom: 24px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title { font-size: 16px; font-weight: 700; }
+
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+    }
+
+    /* FORM GRID */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+    .form-input {
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: var(--purple2); }
+
+    /* PREMIOS FORM */
+    .premios-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+    .premio-row {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .premio-emoji-big { font-size: 24px; text-align: center; }
+
+    /* PROGRESS */
+    .admin-progress {
+      background: rgba(0,0,0,0.3);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .admin-progress-fill {
+      background: linear-gradient(90deg, var(--purple), var(--gold));
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* TABLA COMPRADORES */
+    .tabla-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .boleto-num-td { font-weight: 700; color: var(--gold); }
+    .username-td { color: var(--purple2); font-weight: 500; }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .tag-gratis { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .tag-comprado { background: rgba(124,58,237,0.15); color: var(--purple2); border: 1px solid var(--border); }
+
+    /* ALERT */
+    .alert {
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-warning { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: var(--gold2); }
+    .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.error { border-color: var(--red); color: var(--red); }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    .empty-table { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .main-content { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">⭐</div>
+    <div class="login-title">Lucky Stars Admin</div>
+    <div class="login-sub">Panel de administración</div>
+    <input type="password" class="input-field" id="password-input" placeholder="Contraseña de admin" onkeypress="if(event.key==='Enter')login()">
+    <button class="btn-primary" onclick="login()">Entrar al Panel</button>
+    <div id="login-error" style="color:#ef4444;font-size:13px;margin-top:12px;display:none">Contraseña incorrecta</div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-screen" id="admin-screen">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-logo">⭐ Lucky Stars</span>
+      <span class="topbar-badge">ADMIN</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="font-size:12px;color:var(--muted)" id="last-update">Cargando...</span>
+      <button class="btn-secondary" onclick="cargarStats()">↻ Actualizar</button>
+      <button class="btn-danger" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-card-label">Boletos Vendidos</div>
+        <div class="stat-card-val" id="st-vendidos">—</div>
+        <div class="stat-card-sub" id="st-meta">de 100 meta</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-card-label">Recaudado</div>
+        <div class="stat-card-val" id="st-recaudado">—</div>
+        <div class="stat-card-sub" id="st-recaudado-usd">USD estimado</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-card-label">Total Usuarios</div>
+        <div class="stat-card-val" id="st-usuarios">—</div>
+        <div class="stat-card-sub">registrados en el bot</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-card-label">Sorteos Realizados</div>
+        <div class="stat-card-val" id="st-historial">—</div>
+        <div class="stat-card-sub">en total</div>
+      </div>
+    </div>
+
+    <!-- SORTEO ACTIVO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📊 Sorteo Activo</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="toggleEditar()">✏️ Editar</button>
+          <button class="btn-danger" onclick="cerrarSorteo()">🎲 Realizar Sorteo Ahora</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div id="sorteo-activo-info">
+          <div style="color:var(--muted);text-align:center;padding:20px">Cargando...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITAR SORTEO (oculto por defecto) -->
+    <div class="section" id="editar-section" style="display:none">
+      <div class="section-header">
+        <div class="section-title">✏️ Editar Sorteo Activo</div>
+      </div>
+      <div class="section-card">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Título del sorteo</label>
+            <input type="text" class="form-input" id="edit-titulo" placeholder="Ej: Sorteo #2 — Lucky Stars">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Precio por boleto (Stars)</label>
+            <input type="number" class="form-input" id="edit-precio" placeholder="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Meta de boletos</label>
+            <input type="number" class="form-input" id="edit-meta" placeholder="100">
+          </div>
+        </div>
+
+        <div class="form-label" style="margin-bottom:10px">Premios</div>
+        <div class="premios-form">
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥇</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="p1-desc" placeholder="1er Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="p1-monto" placeholder="2500">
+            </div>
+          </div>
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥈</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="p2-desc" placeholder="2do Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="p2-monto" placeholder="1000">
+            </div>
+          </div>
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥉</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="p3-desc" placeholder="3er Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="p3-monto" placeholder="500">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" style="width:auto;padding:12px 24px" onclick="guardarEdicion()">💾 Guardar Cambios</button>
+      </div>
+    </div>
+
+    <!-- CREAR NUEVO SORTEO -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">➕ Crear Nuevo Sorteo</div>
+      </div>
+      <div class="section-card">
+        <div class="alert alert-warning">⚠️ Solo puedes crear un sorteo nuevo cuando no hay uno activo.</div>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-input" id="new-titulo" placeholder="Ej: Sorteo #2 — Lucky Stars">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Precio por boleto (Stars)</label>
+            <input type="number" class="form-input" id="new-precio" value="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Meta de boletos</label>
+            <input type="number" class="form-input" id="new-meta" value="100">
+          </div>
+        </div>
+
+        <div class="form-label" style="margin-bottom:10px">Premios</div>
+        <div class="premios-form">
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥇</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="n1-desc" value="1er Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="n1-monto" value="2500">
+            </div>
+          </div>
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥈</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="n2-desc" value="2do Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="n2-monto" value="1000">
+            </div>
+          </div>
+          <div class="premio-row">
+            <div class="premio-emoji-big">🥉</div>
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <input type="text" class="form-input" id="n3-desc" value="3er Premio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monto (Stars)</label>
+              <input type="number" class="form-input" id="n3-monto" value="500">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-success" onclick="crearSorteo()">✅ Crear Sorteo</button>
+      </div>
+    </div>
+
+    <!-- COMPRADORES -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">👥 Compradores del Sorteo Activo</div>
+        <span style="font-size:12px;color:var(--muted)" id="total-compradores">0 boletos</span>
+      </div>
+      <div class="section-card">
+        <div class="tabla-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Boleto</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-compradores">
+              <tr><td colspan="5" class="empty-table">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const BACKEND = 'https://luckystars-backend.onrender.com';
+  let adminPassword = '';
+  let statsData = null;
+  let editarVisible = false;
+
+  function login() {
+    const pwd = document.getElementById('password-input').value;
+    if (!pwd) return;
+    adminPassword = pwd;
+    cargarStats().then(ok => {
+      if (ok) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        setInterval(cargarStats, 30000);
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+        adminPassword = '';
+      }
+    });
+  }
+
+  function logout() {
+    adminPassword = '';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('password-input').value = '';
+  }
+
+  async function cargarStats() {
+    try {
+      const res = await fetch(BACKEND + '/admin/stats', {
+        headers: { 'x-admin-password': adminPassword }
+      });
+      if (res.status === 401) return false;
+      statsData = await res.json();
+      renderStats();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function renderStats() {
+    const s = statsData;
+    document.getElementById('st-usuarios').textContent = s.totalUsuarios;
+    document.getElementById('st-historial').textContent = s.historialSorteos;
+    document.getElementById('last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-MX');
+
+    if (s.sorteoActivo) {
+      const sa = s.sorteoActivo;
+      const pct = Math.round((sa.vendidos / sa.metaBoletos) * 100);
+      const usdRecaudado = (sa.totalRecaudado / 50).toFixed(2);
+
+      document.getElementById('st-vendidos').textContent = sa.vendidos;
+      document.getElementById('st-meta').textContent = 'de ' + sa.metaBoletos + ' meta';
+      document.getElementById('st-recaudado').textContent = sa.totalRecaudado + ' ⭐';
+      document.getElementById('st-recaudado-usd').textContent = '$' + usdRecaudado + ' USD estimado';
+
+      document.getElementById('sorteo-activo-info').innerHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-size:18px;font-weight:700;margin-bottom:4px">${sa.titulo}</div>
+          <div style="font-size:12px;color:var(--muted)">ID: ${sa.id}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13px;color:var(--muted)">Progreso</span>
+          <span style="font-size:13px;font-weight:700;color:var(--gold)">${pct}%</span>
+        </div>
+        <div class="admin-progress">
+          <div class="admin-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:20px">
+          <span>${sa.vendidos} vendidos</span>
+          <span>${sa.metaBoletos - sa.vendidos} restantes</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          ${sa.premios.map((p,i) => `
+            <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:20px">${['🥇','🥈','🥉'][i]}</div>
+              <div style="font-size:14px;font-weight:700;color:${['#FFD700','#C0C0C0','#CD7F32'][i]}">\$${(p.monto/50).toFixed(0)} USD</div>
+              <div style="font-size:11px;color:var(--muted)">${p.monto} ⭐</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">${p.descripcion}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // Llenar campos de edición
+      document.getElementById('edit-titulo').value = sa.titulo;
+      document.getElementById('edit-precio').value = sa.premios[0]?.monto ? '' : '';
+      if (sa.premios[0]) { document.getElementById('p1-desc').value = sa.premios[0].descripcion; document.getElementById('p1-monto').value = sa.premios[0].monto; }
+      if (sa.premios[1]) { document.getElementById('p2-desc').value = sa.premios[1].descripcion; document.getElementById('p2-monto').value = sa.premios[1].monto; }
+      if (sa.premios[2]) { document.getElementById('p3-desc').value = sa.premios[2].descripcion; document.getElementById('p3-monto').value = sa.premios[2].monto; }
+
+    } else {
+      document.getElementById('st-vendidos').textContent = '—';
+      document.getElementById('st-recaudado').textContent = '—';
+      document.getElementById('sorteo-activo-info').innerHTML = '<div class="alert alert-warning">⚠️ No hay sorteo activo. Crea uno nuevo abajo.</div>';
+    }
+
+    // Tabla de compradores
+    const boletos = s.boletos || [];
+    document.getElementById('total-compradores').textContent = boletos.length + ' boletos';
+    const tbody = document.getElementById('tabla-compradores');
+    if (boletos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-table">No hay boletos aún</td></tr>';
+    } else {
+      tbody.innerHTML = boletos.map((b, i) => `
+        <tr>
+          <td style="color:var(--muted)">${i + 1}</td>
+          <td class="boleto-num-td">#${b.numero}</td>
+          <td class="username-td">@${b.username || 'usuario'}</td>
+          <td><span class="tag ${b.esBoletoGratis ? 'tag-gratis' : 'tag-comprado'}">${b.esBoletoGratis ? 'Gratis' : 'Comprado'}</span></td>
+          <td style="color:var(--muted)">${b.fecha}</td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  function toggleEditar() {
+    editarVisible = !editarVisible;
+    document.getElementById('editar-section').style.display = editarVisible ? 'block' : 'none';
+  }
+
+  async function guardarEdicion() {
+    const body = {
+      titulo: document.getElementById('edit-titulo').value,
+      premios: [
+        { lugar: 1, descripcion: document.getElementById('p1-desc').value, monto: parseInt(document.getElementById('p1-monto').value), moneda: 'Stars' },
+        { lugar: 2, descripcion: document.getElementById('p2-desc').value, monto: parseInt(document.getElementById('p2-monto').value), moneda: 'Stars' },
+        { lugar: 3, descripcion: document.getElementById('p3-desc').value, monto: parseInt(document.getElementById('p3-monto').value), moneda: 'Stars' }
+      ]
+    };
+    const metaBoletos = parseInt(document.getElementById('edit-meta').value);
+    const precio = parseInt(document.getElementById('edit-precio').value);
+    if (metaBoletos) body.metaBoletos = metaBoletos;
+    if (precio) body.precioPorBoleto = precio;
+
+    try {
+      const res = await fetch(BACKEND + '/admin/editar-sorteo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        mostrarToast('✅ Sorteo actualizado', 'success');
+        await cargarStats();
+        toggleEditar();
+      } else {
+        mostrarToast('Error: ' + data.error, 'error');
+      }
+    } catch (e) {
+      mostrarToast('Error de conexión', 'error');
+    }
+  }
+
+  async function crearSorteo() {
+    const body = {
+      titulo: document.getElementById('new-titulo').value || 'Nuevo Sorteo Lucky Stars',
+      precioPorBoleto: parseInt(document.getElementById('new-precio').value) || 50,
+      metaBoletos: parseInt(document.getElementById('new-meta').value) || 100,
+      premios: [
+        { lugar: 1, descripcion: document.getElementById('n1-desc').value, monto: parseInt(document.getElementById('n1-monto').value), moneda: 'Stars' },
+        { lugar: 2, descripcion: document.getElementById('n2-desc').value, monto: parseInt(document.getElementById('n2-monto').value), moneda: 'Stars' },
+        { lugar: 3, descripcion: document.getElementById('n3-desc').value, monto: parseInt(document.getElementById('n3-monto').value), moneda: 'Stars' }
+      ]
+    };
+
+    try {
+      const res = await fetch(BACKEND + '/admin/crear-sorteo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        mostrarToast('✅ Sorteo creado', 'success');
+        await cargarStats();
+      } else {
+        mostrarToast('Error: ' + data.error, 'error');
+      }
+    } catch (e) {
+      mostrarToast('Error de conexión', 'error');
+    }
+  }
+
+  async function cerrarSorteo() {
+    if (!confirm('¿Realizar el sorteo AHORA? Esto elegirá ganadores aleatoriamente y no se puede deshacer.')) return;
+    try {
+      const res = await fetch(BACKEND + '/admin/cerrar-sorteo', {
+        method: 'POST',
+        headers: { 'x-admin-password': adminPassword }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        mostrarToast('🎉 Sorteo realizado. Ganadores notificados.', 'success');
+        await cargarStats();
+      } else {
+        mostrarToast('Error: ' + data.error, 'error');
+      }
+    } catch (e) {
+      mostrarToast('Error de conexión', 'error');
+    }
+  }
+
+  function mostrarToast(msg, tipo) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast ' + tipo + ' show';
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>
