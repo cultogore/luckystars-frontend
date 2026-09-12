@@ -902,6 +902,15 @@
   }
 
   cargarTodo();
+
+// Auto-refresh cada 30 segundos
+setInterval(async () => {
+  try {
+    const res = await fetch(BACKEND + '/api/sorteo');
+    sorteoData = await res.json();
+    if (!sorteoData.error) renderSorteo();
+  } catch(e) {}
+}, 30000);
 </script>
 </body>
 </html>
