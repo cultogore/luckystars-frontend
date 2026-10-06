@@ -1,805 +1,705 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lucky Stars — Admin</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Lucky Stars — Panel Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0B0B18; --bg2: #101026; --card: #15152F; --card2: #1B1B3B;
+  --line: rgba(255,255,255,.07); --line2: rgba(124,58,237,.38);
+  --text: #F1F0FF; --muted: #8B85A0; --faint: #5E5A75;
+  --purple: #7C3AED; --purple2: #A855F7; --gold: #FFD700; --gold2: #FFA500;
+  --green: #22c55e; --red: #ef4444; --blue: #38bdf8; --pink: #EC4899; --amber: #f59e0b;
+  --radius: 16px; --side: 232px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: dark; }
+body { font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 15% 0%, rgba(124,58,237,.16), transparent 50%), radial-gradient(ellipse at 90% 100%, rgba(236,72,153,.09), transparent 50%); }
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--purple2); outline-offset: 2px; }
+.hidden { display: none !important; }
+.muted { color: var(--muted); } .gold { color: var(--gold); } .green { color: var(--green); } .red { color: var(--red); }
+.mono { font-variant-numeric: tabular-nums; }
 
-    :root {
-      --gold: #FFD700;
-      --gold2: #FFA500;
-      --purple: #7C3AED;
-      --purple2: #A855F7;
-      --green: #22c55e;
-      --red: #ef4444;
-      --dark: #0D0D1A;
-      --dark2: #13132A;
-      --dark3: #1A1A35;
-      --card: #16162E;
-      --border: rgba(124,58,237,0.25);
-      --text: #F1F0FF;
-      --muted: #8B85A0;
-    }
+/* ── Login ── */
+#login { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.login-card { width: 100%; max-width: 380px; background: linear-gradient(160deg, var(--card2), var(--card)); border: 1px solid var(--line2); border-radius: 24px; padding: 36px 30px; text-align: center; box-shadow: 0 24px 80px rgba(124,58,237,.18); }
+.login-logo { font-size: 44px; margin-bottom: 6px; filter: drop-shadow(0 0 18px rgba(255,215,0,.45)); }
+.login-title { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--gold), var(--gold2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.login-sub { color: var(--muted); font-size: 13px; margin: 4px 0 26px; }
+.pass-wrap { position: relative; margin-bottom: 12px; }
+.pass-wrap .input { padding-right: 46px; text-align: center; letter-spacing: 2px; }
+.pass-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; width: 38px; height: 38px; border-radius: 10px; font-size: 16px; opacity: .7; }
+.pass-eye:hover { opacity: 1; background: rgba(255,255,255,.05); }
+.login-err { color: var(--red); font-size: 13px; min-height: 20px; margin-bottom: 8px; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Shell ── */
+#app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+.side { width: var(--side); flex-shrink: 0; background: rgba(16,16,38,.85); backdrop-filter: blur(12px); border-right: 1px solid var(--line); padding: 20px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 22px; }
+.brand-ico { font-size: 26px; filter: drop-shadow(0 0 10px rgba(255,215,0,.5)); }
+.brand-name { font-weight: 800; font-size: 17px; line-height: 1.1; }
+.brand-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--purple2); }
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav button { display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: 1px solid transparent; border-radius: 12px; padding: 11px 12px; color: var(--muted); font-weight: 600; text-align: left; transition: .15s; position: relative; }
+.nav button:hover { background: rgba(255,255,255,.04); color: var(--text); }
+.nav button.active { background: linear-gradient(90deg, rgba(124,58,237,.28), rgba(124,58,237,.08)); border-color: var(--line2); color: #fff; }
+.nav .ico { font-size: 17px; width: 22px; text-align: center; }
+.nav .badge { margin-left: auto; background: var(--amber); color: #1a1200; font-size: 11px; font-weight: 800; border-radius: 99px; padding: 1px 7px; }
+.side-foot { margin-top: auto; padding: 10px 8px 0; font-size: 12px; color: var(--faint); }
+.main { flex: 1; min-width: 0; padding: 0 28px 40px; }
+.topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 16px 0; background: linear-gradient(var(--bg) 70%, transparent); }
+.topbar h1 { font-size: 22px; font-weight: 800; letter-spacing: -.3px; }
+.topbar .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.topbar .sp { flex: 1; }
+.live-dot { display: inline-block; width: 7px; height: 7px; background: var(--green); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 0 0 rgba(34,197,94,.6); animation: pulse 2s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(34,197,94,0); } 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); } }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--dark);
-      color: var(--text);
-      min-height: 100vh;
-    }
+/* ── Controles ── */
+.input, select.input, textarea.input { width: 100%; background: rgba(0,0,0,.32); border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; outline: none; transition: .15s; min-height: 42px; }
+.input:focus { border-color: var(--purple2); box-shadow: 0 0 0 3px rgba(168,85,247,.18); }
+.input::placeholder { color: var(--faint); }
+textarea.input { resize: vertical; min-height: 78px; }
+select.input option { background: #15152F; }
+label.lbl { display: block; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
+.hint { font-size: 12px; color: var(--faint); margin-top: 5px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.05); border-radius: 12px; padding: 0 16px; min-height: 42px; font-weight: 700; transition: .15s; white-space: nowrap; }
+.btn:hover { background: rgba(255,255,255,.09); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.primary { background: linear-gradient(135deg, var(--purple), var(--purple2)); border-color: transparent; color: #fff; box-shadow: 0 6px 22px rgba(124,58,237,.35); }
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); border-color: transparent; color: #241a00; }
+.btn.success { background: rgba(34,197,94,.14); border-color: rgba(34,197,94,.4); color: #6ee7a0; }
+.btn.danger { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.4); color: #fca5a5; }
+.btn.danger:hover { background: rgba(239,68,68,.22); }
+.btn.sm { min-height: 34px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+.btn.block { width: 100%; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fld { margin-bottom: 14px; }
 
-    /* LOGIN */
-    .login-screen {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+/* ── Tarjetas ── */
+.card { background: linear-gradient(160deg, rgba(27,27,59,.85), rgba(21,21,47,.92)); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; }
+.card-h { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.card-h h2 { font-size: 15px; font-weight: 800; }
+.card-h .sp { flex: 1; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.kpi { position: relative; overflow: hidden; border-radius: var(--radius); padding: 18px; background: var(--card); border: 1px solid var(--line); }
+.kpi::after { content: ''; position: absolute; right: -24px; top: -24px; width: 90px; height: 90px; border-radius: 50%; background: var(--c, var(--purple)); opacity: .14; }
+.kpi .k-l { font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; color: var(--muted); }
+.kpi .k-v { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin: 6px 0 2px; color: var(--c, var(--text)); }
+.kpi .k-s { font-size: 12px; color: var(--muted); }
+.up { color: var(--green); } .down { color: var(--red); }
+.alert { display: flex; gap: 12px; align-items: flex-start; border-radius: 14px; padding: 13px 15px; margin-bottom: 14px; border: 1px solid; font-size: 13px; }
+.alert .a-i { font-size: 18px; line-height: 1.2; }
+.alert.warn { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.35); color: #fcd34d; }
+.alert.info { background: rgba(56,189,248,.09); border-color: rgba(56,189,248,.3); color: #7dd3fc; }
+.alert.bad { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.35); color: #fca5a5; }
+.alert.good { background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.3); color: #86efac; }
+.alert a, .alert button.lnk { color: inherit; font-weight: 800; text-decoration: underline; background: none; border: 0; padding: 0; }
 
-    .login-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 40px;
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-    }
+.bar { height: 12px; background: rgba(0,0,0,.4); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--purple), var(--pink), var(--gold)); transition: width .6s; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { background: rgba(0,0,0,.3); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; min-width: 112px; text-align: center; }
+.chip .c-e { font-size: 20px; } .chip .c-m { font-weight: 800; font-size: 16px; } .chip .c-d { font-size: 11px; color: var(--muted); }
+.tag { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; border: 1px solid; white-space: nowrap; }
+.t-ad { color: #86efac; background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.3); }
+.t-canal { color: #7dd3fc; background: rgba(56,189,248,.1); border-color: rgba(56,189,248,.3); }
+.t-referido { color: #f9a8d4; background: rgba(236,72,153,.1); border-color: rgba(236,72,153,.3); }
+.t-bonus { color: #fde047; background: rgba(255,215,0,.1); border-color: rgba(255,215,0,.3); }
+.t-regalo { color: #d8b4fe; background: rgba(168,85,247,.12); border-color: rgba(168,85,247,.35); }
+.t-compra, .t-otro { color: #cbd5e1; background: rgba(148,163,184,.1); border-color: rgba(148,163,184,.3); }
+.t-ok { color: #86efac; background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.3); }
+.t-pend { color: #fcd34d; background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.35); }
+.t-ban { color: #fca5a5; background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.35); }
 
-    .login-icon { font-size: 48px; margin-bottom: 16px; }
-    .login-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
-    .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+/* ── Gráficas ── */
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .cv { fill: var(--text); font-size: 11px; font-weight: 700; text-anchor: middle; }
+.chart .cl { fill: var(--faint); font-size: 10px; text-anchor: middle; }
+.hbar { display: grid; grid-template-columns: 112px 1fr 64px; gap: 10px; align-items: center; margin-bottom: 11px; font-size: 13px; }
+.hbar .h-t { height: 10px; background: rgba(0,0,0,.4); border-radius: 99px; overflow: hidden; }
+.hbar .h-t i { display: block; height: 100%; border-radius: 99px; }
+.hbar .h-n { text-align: right; font-weight: 700; }
 
-    .input-field {
-      width: 100%;
-      padding: 14px 16px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-size: 15px;
-      font-family: 'Inter', sans-serif;
-      margin-bottom: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+/* ── Tablas ── */
+.tbl-wrap { overflow-x: auto; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+td .u-n { font-weight: 700; } td .u-s { font-size: 12px; color: var(--muted); }
+.empty { text-align: center; color: var(--muted); padding: 34px 10px; }
+.pager { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+.toolbar .input { flex: 1; min-width: 180px; }
+.toolbar select.input { flex: 0 0 auto; width: auto; min-width: 160px; }
+.chk { display: flex; align-items: center; gap: 8px; color: var(--muted); font-weight: 600; cursor: pointer; }
+.chk input { width: 17px; height: 17px; accent-color: var(--purple2); }
 
-    .input-field:focus { border-color: var(--purple2); }
+/* ── Premios editor ── */
+.prem-row { display: grid; grid-template-columns: 36px 1fr 150px 40px; gap: 10px; align-items: center; margin-bottom: 10px; }
+.prem-row .medal { font-size: 24px; text-align: center; }
+.money-in { position: relative; } .money-in span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 700; } .money-in .input { padding-left: 28px; }
+.estim { border-radius: 14px; padding: 14px 16px; background: rgba(0,0,0,.25); border: 1px dashed var(--line2); margin: 6px 0 18px; font-size: 13px; }
+.estim .e-r { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.estim .e-r b { font-variant-numeric: tabular-nums; }
+.winner-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.winner-h h3 { font-size: 15px; }
 
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--purple), var(--purple2));
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
+/* ── Modal / Toast ── */
+.modal-bg { position: fixed; inset: 0; background: rgba(5,5,14,.72); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 18px; animation: fade .15s; }
+.modal { width: 100%; max-width: 440px; background: var(--card2); border: 1px solid var(--line2); border-radius: 20px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.6); max-height: 90vh; overflow-y: auto; }
+.modal h3 { font-size: 18px; margin-bottom: 8px; } .modal p { color: var(--muted); margin-bottom: 18px; }
+.modal .acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+@keyframes fade { from { opacity: 0; } }
+#toasts { position: fixed; right: 18px; bottom: 18px; z-index: 200; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+.toast { background: var(--card2); border: 1px solid var(--line2); border-left-width: 4px; border-radius: 12px; padding: 12px 16px; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,.5); animation: slide .25s; font-weight: 600; }
+.toast.ok { border-left-color: var(--green); } .toast.err { border-left-color: var(--red); }
+@keyframes slide { from { transform: translateY(14px); opacity: 0; } }
+.spin { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.2); border-top-color: var(--purple2); border-radius: 50%; animation: rot .7s linear infinite; display: inline-block; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.loading { display: flex; align-items: center; gap: 12px; justify-content: center; color: var(--muted); padding: 60px 0; }
 
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:active { transform: scale(0.98); }
-
-    .btn-danger {
-      padding: 10px 20px;
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 10px;
-      color: var(--red);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .btn-danger:hover { background: rgba(239,68,68,0.25); }
-
-    .btn-success {
-      padding: 10px 20px;
-      background: rgba(34,197,94,0.15);
-      border: 1px solid rgba(34,197,94,0.3);
-      border-radius: 10px;
-      color: var(--green);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .btn-success:hover { background: rgba(34,197,94,0.25); }
-
-    .btn-secondary {
-      padding: 10px 20px;
-      background: rgba(124,58,237,0.15);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--purple2);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover { background: rgba(124,58,237,0.25); }
-
-    /* ADMIN PANEL */
-    .admin-screen { display: none; }
-
-    .topbar {
-      background: var(--dark2);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .topbar-left { display: flex; align-items: center; gap: 10px; }
-    .topbar-logo { font-size: 20px; font-weight: 800; }
-    .topbar-badge {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: var(--red);
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
-    }
-
-    .main-content { padding: 24px; max-width: 1100px; margin: 0 auto; }
-
-    /* STATS GRID */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 2px;
-    }
-
-    .stat-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--purple2)); }
-    .stat-card.gold::before { background: linear-gradient(90deg, var(--gold2), var(--gold)); }
-    .stat-card.green::before { background: var(--green); }
-    .stat-card.red::before { background: var(--red); }
-
-    .stat-card-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .stat-card-val { font-size: 28px; font-weight: 800; color: var(--text); }
-    .stat-card-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    /* SECTIONS */
-    .section { margin-bottom: 24px; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .section-title { font-size: 16px; font-weight: 700; }
-
-    .section-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-    }
-
-    /* FORM GRID */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 12px; font-weight: 600; color: var(--muted); }
-
-    .form-input {
-      padding: 12px 14px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus { border-color: var(--purple2); }
-
-    /* PREMIOS FORM */
-    .premios-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-
-    .premio-row {
-      display: grid;
-      grid-template-columns: auto 1fr 1fr;
-      gap: 10px;
-      align-items: center;
-      background: rgba(0,0,0,0.2);
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    .premio-emoji-big { font-size: 24px; text-align: center; }
-
-    /* PROGRESS */
-    .admin-progress {
-      background: rgba(0,0,0,0.3);
-      border-radius: 999px;
-      height: 12px;
-      overflow: hidden;
-      margin: 12px 0;
-    }
-
-    .admin-progress-fill {
-      background: linear-gradient(90deg, var(--purple), var(--gold));
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.5s ease;
-    }
-
-    /* TABLA COMPRADORES */
-    .tabla-wrap { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th {
-      text-align: left;
-      padding: 10px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      vertical-align: middle;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .boleto-num-td { font-weight: 700; color: var(--gold); }
-    .username-td { color: var(--purple2); font-weight: 500; }
-
-    .tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 6px;
-    }
-
-    .tag-gratis { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-    .tag-comprado { background: rgba(124,58,237,0.15); color: var(--purple2); border: 1px solid var(--border); }
-
-    /* ALERT */
-    .alert {
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .alert-warning { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: var(--gold2); }
-    .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--dark3);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      transform: translateY(80px);
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 999;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { border-color: var(--green); color: var(--green); }
-    .toast.error { border-color: var(--red); color: var(--red); }
-
-    .divider { height: 1px; background: var(--border); margin: 20px 0; }
-
-    .empty-table { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
-
-    @media (max-width: 600px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .main-content { padding: 16px; }
-    }
-  </style>
+/* ── Responsive ── */
+@media (max-width: 920px) {
+  #app { flex-direction: column; }
+  .side { position: fixed; z-index: 50; bottom: 0; left: 0; right: 0; top: auto; width: 100%; height: auto; flex-direction: row; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line); background: rgba(13,13,32,.96); }
+  .brand, .side-foot { display: none; }
+  .nav { flex-direction: row; width: 100%; justify-content: space-around; gap: 2px; }
+  .nav button { flex-direction: column; gap: 2px; padding: 7px 4px; font-size: 10px; text-align: center; justify-content: center; flex: 1; min-width: 0; }
+  .nav .badge { position: absolute; top: 2px; right: 14%; margin: 0; font-size: 9px; padding: 0 5px; }
+  .main { padding: 0 16px 100px; }
+  .charts, .grid2 { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: 1fr; }
+  .topbar h1 { font-size: 19px; }
+  .prem-row { grid-template-columns: 28px 1fr 112px 36px; gap: 8px; }
+  #toasts { right: 12px; left: 12px; bottom: 84px; align-items: stretch; }
+}
+@media (max-width: 920px) { .kpis { grid-template-columns: 1fr 1fr; gap: 10px; } .kpi { padding: 14px; } .kpi .k-v { font-size: 24px; } }
+@media (max-width: 920px) { .hide-m { display: none; } #logout-m { display: inline-flex !important; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login-screen" id="login-screen">
-  <div class="login-card">
-    <div class="login-icon">⭐</div>
-    <div class="login-title">Lucky Stars Admin</div>
+<div id="login">
+  <form class="login-card" onsubmit="login(event)">
+    <div class="login-logo">⭐</div>
+    <div class="login-title">Lucky Stars</div>
     <div class="login-sub">Panel de administración</div>
-    <input type="password" class="input-field" id="password-input" placeholder="Contraseña de admin" onkeypress="if(event.key==='Enter')login()">
-    <button class="btn-primary" onclick="login()">Entrar al Panel</button>
-    <div id="login-error" style="color:#ef4444;font-size:13px;margin-top:12px;display:none">Contraseña incorrecta</div>
+    <div class="pass-wrap">
+      <input class="input" id="pass" type="password" placeholder="Contraseña" autocomplete="current-password" autofocus>
+      <button type="button" class="pass-eye" onclick="verPass()" aria-label="Mostrar contraseña">👁</button>
+    </div>
+    <div class="login-err" id="login-err" role="alert"></div>
+    <button class="btn primary block" id="login-btn" type="submit">Entrar</button>
+  </form>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <aside class="side">
+    <div class="brand"><span class="brand-ico">⭐</span><div><div class="brand-name">Lucky Stars</div><div class="brand-tag">ADMIN</div></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot"><button class="btn sm block danger" onclick="logout()">Cerrar sesión</button></div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div><h1 id="t-title">Resumen</h1><div class="sub" id="t-sub"></div></div>
+      <div class="sp"></div>
+      <span class="muted" style="font-size:12px" id="last-update"><span class="live-dot"></span>Conectando…</span>
+      <button class="btn sm" onclick="refrescar()" title="Actualizar">↻ <span class="hide-m">Actualizar</span></button>
+      <button class="btn sm danger" onclick="logout()" style="display:none" id="logout-m">Salir</button>
+    </header>
+    <main id="view"></main>
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
-<div class="admin-screen" id="admin-screen">
-
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-logo">⭐ Lucky Stars</span>
-      <span class="topbar-badge">ADMIN</span>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <span style="font-size:12px;color:var(--muted)" id="last-update">Cargando...</span>
-      <button class="btn-secondary" onclick="cargarStats()">↻ Actualizar</button>
-      <button class="btn-danger" onclick="logout()">Salir</button>
-    </div>
-  </div>
-
-  <div class="main-content">
-
-    <!-- STATS -->
-    <div class="stats-grid">
-      <div class="stat-card purple">
-        <div class="stat-card-label">Boletos Vendidos</div>
-        <div class="stat-card-val" id="st-vendidos">—</div>
-        <div class="stat-card-sub" id="st-meta">de 100 meta</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-card-label">Recaudado</div>
-        <div class="stat-card-val" id="st-recaudado">—</div>
-        <div class="stat-card-sub" id="st-recaudado-usd">USD estimado</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-card-label">Total Usuarios</div>
-        <div class="stat-card-val" id="st-usuarios">—</div>
-        <div class="stat-card-sub">registrados en el bot</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-card-label">Sorteos Realizados</div>
-        <div class="stat-card-val" id="st-historial">—</div>
-        <div class="stat-card-sub">en total</div>
-      </div>
-    </div>
-
-    <!-- SORTEO ACTIVO -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">📊 Sorteo Activo</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-secondary" onclick="toggleEditar()">✏️ Editar</button>
-          <button class="btn-danger" onclick="cerrarSorteo()">🎲 Realizar Sorteo Ahora</button>
-        </div>
-      </div>
-      <div class="section-card">
-        <div id="sorteo-activo-info">
-          <div style="color:var(--muted);text-align:center;padding:20px">Cargando...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- EDITAR SORTEO (oculto por defecto) -->
-    <div class="section" id="editar-section" style="display:none">
-      <div class="section-header">
-        <div class="section-title">✏️ Editar Sorteo Activo</div>
-      </div>
-      <div class="section-card">
-        <div class="form-grid">
-          <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">Título del sorteo</label>
-            <input type="text" class="form-input" id="edit-titulo" placeholder="Ej: Sorteo #2 — Lucky Stars">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Precio por boleto (Stars)</label>
-            <input type="number" class="form-input" id="edit-precio" placeholder="50">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Meta de boletos</label>
-            <input type="number" class="form-input" id="edit-meta" placeholder="100">
-          </div>
-        </div>
-
-        <div class="form-label" style="margin-bottom:10px">Premios</div>
-        <div class="premios-form">
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥇</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="p1-desc" placeholder="1er Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="p1-monto" placeholder="2500">
-            </div>
-          </div>
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥈</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="p2-desc" placeholder="2do Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="p2-monto" placeholder="1000">
-            </div>
-          </div>
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥉</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="p3-desc" placeholder="3er Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="p3-monto" placeholder="500">
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-primary" style="width:auto;padding:12px 24px" onclick="guardarEdicion()">💾 Guardar Cambios</button>
-      </div>
-    </div>
-
-    <!-- CREAR NUEVO SORTEO -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">➕ Crear Nuevo Sorteo</div>
-      </div>
-      <div class="section-card">
-        <div class="alert alert-warning">⚠️ Solo puedes crear un sorteo nuevo cuando no hay uno activo.</div>
-        <div class="form-grid">
-          <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">Título</label>
-            <input type="text" class="form-input" id="new-titulo" placeholder="Ej: Sorteo #2 — Lucky Stars">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Precio por boleto (Stars)</label>
-            <input type="number" class="form-input" id="new-precio" value="50">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Meta de boletos</label>
-            <input type="number" class="form-input" id="new-meta" value="100">
-          </div>
-        </div>
-
-        <div class="form-label" style="margin-bottom:10px">Premios</div>
-        <div class="premios-form">
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥇</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="n1-desc" value="1er Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="n1-monto" value="2500">
-            </div>
-          </div>
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥈</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="n2-desc" value="2do Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="n2-monto" value="1000">
-            </div>
-          </div>
-          <div class="premio-row">
-            <div class="premio-emoji-big">🥉</div>
-            <div class="form-group">
-              <label class="form-label">Descripción</label>
-              <input type="text" class="form-input" id="n3-desc" value="3er Premio">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Monto (Stars)</label>
-              <input type="number" class="form-input" id="n3-monto" value="500">
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-success" onclick="crearSorteo()">✅ Crear Sorteo</button>
-      </div>
-    </div>
-
-    <!-- COMPRADORES -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">👥 Compradores del Sorteo Activo</div>
-        <span style="font-size:12px;color:var(--muted)" id="total-compradores">0 boletos</span>
-      </div>
-      <div class="section-card">
-        <div class="tabla-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Boleto</th>
-                <th>Usuario</th>
-                <th>Tipo</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-compradores">
-              <tr><td colspan="5" class="empty-table">Cargando...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
+<div id="modal-root"></div>
+<div id="toasts" aria-live="polite"></div>
 
 <script>
-  const BACKEND = 'https://luckystars-backend.onrender.com';
-  let adminPassword = '';
-  let statsData = null;
-  let editarVisible = false;
+const BACKEND = 'https://luckystars-backend.onrender.com';
+const S = { pass: '', stats: null, view: 'resumen', draft: null, timer: null,
+  boletos: { q: '', origen: '', page: 1 }, usuarios: { q: '', orden: 'recientes', baneados: false, page: 1 } };
 
-  function login() {
-    const pwd = document.getElementById('password-input').value;
-    if (!pwd) return;
-    adminPassword = pwd;
-    cargarStats().then(ok => {
-      if (ok) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-screen').style.display = 'block';
-        setInterval(cargarStats, 30000);
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-        adminPassword = '';
-      }
+const VISTAS = {
+  resumen:  { ico: '📊', nombre: 'Resumen',  sub: 'Estado general de Lucky Stars' },
+  sorteo:   { ico: '🎯', nombre: 'Sorteo',   sub: 'Crea, edita y realiza sorteos' },
+  boletos:  { ico: '🎟', nombre: 'Boletos',  sub: 'Participantes del sorteo activo' },
+  usuarios: { ico: '👥', nombre: 'Usuarios', sub: 'Quién usa el bot y cuánto participa' },
+  ganadores:{ ico: '🏆', nombre: 'Ganadores',sub: 'Historial de sorteos y pago de premios' },
+  ajustes:  { ico: '⚙️', nombre: 'Ajustes',  sub: 'Anuncios, límites y mensajes del bot' }
+};
+const ORIGEN = {
+  ad: ['📺 Anuncio', '#22c55e'], canal: ['📣 Canal', '#38bdf8'], referido: ['👥 Referido', '#EC4899'],
+  bonus: ['🌟 Bonus', '#FFD700'], regalo: ['🎁 Regalo', '#A855F7'], compra: ['⭐ Comprado', '#94a3b8'], otro: ['Otro', '#64748b']
+};
+const MEDALLAS = ['🥇', '🥈', '🥉'];
+const medalla = i => MEDALLAS[i] || '🏅';
+
+/* ── utilidades ── */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = n => Number(n || 0).toLocaleString('es-MX');
+const usd = n => '$' + (Number(n) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usdCorto = n => '$' + (Number.isInteger(+n) ? num(n) : (+n).toFixed(2));
+const fechaCorta = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+const fechaLarga = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' }) : '—';
+const ss = { get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }, del(k) { try { sessionStorage.removeItem(k); } catch (e) {} } };
+
+function toast(msg, tipo = 'ok') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + tipo; el.textContent = msg; $('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(BACKEND + path, {
+    method: opts.method || 'GET',
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': S.pass },
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if (res.status === 401) { logout(true); throw new Error('Sesión no válida'); }
+  if (res.status === 429) throw new Error('Demasiados intentos. Espera unos minutos.');
+  let data; try { data = await res.json(); } catch (e) { throw new Error('Respuesta inválida del servidor'); }
+  if (data && data.error) throw new Error(data.error);
+  return data;
+}
+
+function modal({ titulo, html, botones }) {
+  return new Promise(resolve => {
+    const bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><h3>${titulo}</h3><div>${html}</div><div class="acts"></div></div>`;
+    const cerrar = v => { bg.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = e => { if (e.key === 'Escape') cerrar(null); };
+    botones.forEach(b => {
+      const el = document.createElement('button');
+      el.className = 'btn ' + (b.clase || ''); el.textContent = b.texto;
+      el.onclick = () => cerrar(b.valor !== undefined ? b.valor : b.texto);
+      bg.querySelector('.acts').appendChild(el);
     });
+    bg.addEventListener('mousedown', e => { if (e.target === bg) cerrar(null); });
+    document.addEventListener('keydown', onKey);
+    $('modal-root').appendChild(bg);
+    const first = bg.querySelector('input, textarea, .btn:last-child'); if (first) first.focus();
+    bg._leer = () => Object.fromEntries([...bg.querySelectorAll('[data-f]')].map(i => [i.dataset.f, i.type === 'checkbox' ? i.checked : i.value]));
+    bg.querySelectorAll('.btn').forEach(el => { const prev = el.onclick; el.onclick = () => { const datos = bg._leer(); S._modalDatos = datos; prev(); }; });
+  });
+}
+async function confirmar(titulo, texto, ok = 'Confirmar', peligro = true) {
+  const r = await modal({ titulo, html: `<p>${texto}</p>`, botones: [{ texto: 'Cancelar', valor: false }, { texto: ok, clase: peligro ? 'danger' : 'primary', valor: true }] });
+  return r === true;
+}
+async function accion(btn, fn) {
+  if (btn) btn.disabled = true;
+  try { return await fn(); } catch (e) { toast(e.message, 'err'); } finally { if (btn) btn.disabled = false; }
+}
+
+/* ── sesión ── */
+function verPass() { const i = $('pass'); i.type = i.type === 'password' ? 'text' : 'password'; }
+
+async function login(ev) {
+  if (ev) ev.preventDefault();
+  const pwd = $('pass').value; if (!pwd) return;
+  const btn = $('login-btn'); btn.disabled = true; $('login-err').textContent = '';
+  btn.innerHTML = '<span class="spin"></span> Conectando…';
+  const lento = setTimeout(() => { btn.innerHTML = '<span class="spin"></span> Despertando el servidor (hasta 1 min)…'; }, 4000);
+  try {
+    const res = await fetch(BACKEND + '/admin/stats', { headers: { 'x-admin-password': pwd } });
+    if (res.status === 401) throw new Error('Contraseña incorrecta');
+    if (res.status === 429) throw new Error('Demasiados intentos. Espera unos minutos.');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    S.pass = pwd; S.stats = data; ss.set('ls_admin', pwd);
+    entrar();
+  } catch (e) {
+    $('login-err').textContent = e.message === 'Failed to fetch' ? 'No se pudo conectar con el servidor' : e.message;
+    S.pass = '';
+  } finally { clearTimeout(lento); btn.disabled = false; btn.textContent = 'Entrar'; }
+}
+
+function entrar() {
+  $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('pass').value = '';
+  const h = (location.hash || '').slice(1); S.view = VISTAS[h] ? h : 'resumen';
+  pintarNav(); ir(S.view, true);
+  clearInterval(S.timer); S.timer = setInterval(() => cargarStats(true), 30000);
+}
+
+function logout(expirada) {
+  S.pass = ''; S.stats = null; ss.del('ls_admin'); clearInterval(S.timer);
+  $('app').classList.add('hidden'); $('login').classList.remove('hidden');
+  $('login-err').textContent = expirada === true ? 'Sesión expirada. Vuelve a entrar.' : '';
+}
+
+/* ── navegación ── */
+function pintarNav() {
+  const pend = S.stats ? S.stats.totales.pagosPendientes : 0;
+  $('nav').innerHTML = Object.entries(VISTAS).map(([k, v]) =>
+    `<button class="${k === S.view ? 'active' : ''}" onclick="ir('${k}')"><span class="ico">${v.ico}</span><span>${v.nombre}</span>${k === 'ganadores' && pend ? `<span class="badge">${pend}</span>` : ''}</button>`).join('');
+}
+
+async function ir(vista, inicial) {
+  S.view = vista; location.hash = vista; pintarNav();
+  $('t-title').textContent = VISTAS[vista].nombre; $('t-sub').textContent = VISTAS[vista].sub;
+  $('view').innerHTML = '<div class="loading"><span class="spin"></span> Cargando…</div>';
+  try {
+    if (vista === 'resumen' || vista === 'sorteo' || vista === 'ajustes' || inicial) await cargarStats(true);
+    if (vista === 'resumen') renderResumen();
+    else if (vista === 'sorteo') renderSorteo();
+    else if (vista === 'boletos') await renderBoletos();
+    else if (vista === 'usuarios') await renderUsuarios();
+    else if (vista === 'ganadores') await renderGanadores();
+    else if (vista === 'ajustes') renderAjustes();
+  } catch (e) { $('view').innerHTML = `<div class="alert bad"><span class="a-i">⚠️</span><div>${esc(e.message)}</div></div>`; }
+}
+
+async function cargarStats(silencioso) {
+  S.stats = await api('/admin/stats');
+  $('last-update').innerHTML = '<span class="live-dot"></span>Actualizado ' + new Date().toLocaleTimeString('es-MX');
+  pintarNav();
+  if (silencioso && S.view === 'resumen' && !document.querySelector('.modal-bg')) renderResumen();
+}
+async function refrescar() { await accion(null, async () => { await ir(S.view); toast('Datos actualizados'); }); }
+
+/* ── gráficas ── */
+function corto(d) { const p = d.split('-'); return p[2] + '/' + p[1]; }
+function barChart(datos, color) {
+  const W = 620, H = 170, t = 22, b = 24, l = 6, r = 6;
+  const max = Math.max(1, ...datos.map(d => d.v));
+  const bw = (W - l - r) / datos.length;
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  svg += `<line x1="${l}" x2="${W - r}" y1="${H - b}" y2="${H - b}" stroke="rgba(255,255,255,.1)"/>`;
+  datos.forEach((d, i) => {
+    const h = d.v ? Math.max(3, Math.round((d.v / max) * (H - t - b))) : 0;
+    const x = l + i * bw + bw * .16, w = bw * .68, y = H - b - h;
+    if (h) svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${color}"><title>${esc(d.dia)}: ${num(d.v)}</title></rect>`;
+    if (d.v) svg += `<text class="cv" x="${x + w / 2}" y="${y - 5}">${num(d.v)}</text>`;
+    svg += `<text class="cl" x="${x + w / 2}" y="${H - 8}">${corto(d.dia)}</text>`;
+  });
+  return svg + '</svg>';
+}
+function hbars(porOrigen) {
+  const total = Object.values(porOrigen).reduce((a, b) => a + b, 0);
+  if (!total) return '<div class="empty">Aún no hay boletos</div>';
+  return Object.entries(ORIGEN).filter(([k]) => porOrigen[k]).map(([k, [nombre, color]]) => {
+    const n = porOrigen[k], pct = Math.round((n / total) * 100);
+    return `<div class="hbar"><span>${nombre}</span><div class="h-t"><i style="width:${pct}%;background:${color}"></i></div><span class="h-n">${num(n)} <span class="muted" style="font-weight:500">${pct}%</span></span></div>`;
+  }).join('');
+}
+function cuentaAtras(iso) {
+  const ms = new Date(iso) - new Date(); if (ms <= 0) return 'en breve';
+  const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+  return d ? `en ${d} d ${h} h` : h ? `en ${h} h ${m % 60} min` : `en ${m} min`;
+}
+function equilibrio(premiosUsd, cpm) { return cpm > 0 ? Math.ceil(premiosUsd / (cpm / 1000)) : null; }
+
+/* ── RESUMEN ── */
+function renderResumen() {
+  const s = S.stats, sa = s.sorteoActivo, t = s.totales, an = s.anuncios, ing = s.ingresos;
+  const dif = an.hoy - an.ayer;
+  let alertas = '';
+  if (!sa) alertas += `<div class="alert warn"><span class="a-i">⚠️</span><div><b>No hay un sorteo activo.</b> Los usuarios no pueden ganar boletos. <button class="lnk" onclick="ir('sorteo')">Crear sorteo →</button></div></div>`;
+  if (t.pagosPendientes) alertas += `<div class="alert info"><span class="a-i">💸</span><div><b>${t.pagosPendientes} premio(s) por pagar</b> (${usd(t.pagosPendientesUsd)}). <button class="lnk" onclick="ir('ganadores')">Ver ganadores →</button></div></div>`;
+  if (sa) {
+    if (sa.porcentaje >= 90) alertas += `<div class="alert good"><span class="a-i">🔥</span><div>El sorteo está al <b>${sa.porcentaje}%</b>; se realizará solo al llegar a ${num(sa.metaBoletos)} boletos.</div></div>`;
+    const eq = equilibrio(sa.premioTotalUsd, ing.cpmUsd);
+    if (eq && sa.metaBoletos < eq) alertas += `<div class="alert warn"><span class="a-i">📉</span><div>Con CPM de ${usd(ing.cpmUsd)}, los premios (${usd(sa.premioTotalUsd)}) cuestan más de lo que generan ${num(sa.metaBoletos)} anuncios. Necesitas ≈ <b>${num(eq)} boletos</b> para no perder. <button class="lnk" onclick="ir('sorteo')">Ajustar →</button></div></div>`;
   }
 
-  function logout() {
-    adminPassword = '';
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-screen').style.display = 'none';
-    document.getElementById('password-input').value = '';
-  }
+  const kpis = `<div class="kpis">
+    <div class="kpi" style="--c:var(--green)"><div class="k-l">Anuncios hoy</div><div class="k-v mono">${num(an.hoy)}</div><div class="k-s">${an.unicosHoy} usuarios · <span class="${dif >= 0 ? 'up' : 'down'}">${dif >= 0 ? '▲' : '▼'} ${Math.abs(dif)} vs ayer</span></div></div>
+    <div class="kpi" style="--c:var(--gold)"><div class="k-l">Ingresos est. hoy</div><div class="k-v mono">${usd(ing.hoyUsd)}</div><div class="k-s">7 días: ${usd(ing.ultimos7Usd)} · CPM ${usd(ing.cpmUsd)}</div></div>
+    <div class="kpi" style="--c:var(--purple2)"><div class="k-l">Boletos del sorteo</div><div class="k-v mono">${sa ? num(sa.vendidos) : '—'}</div><div class="k-s">${sa ? `de ${num(sa.metaBoletos)} · ${num(sa.participantes)} participantes` : 'sin sorteo activo'}</div></div>
+    <div class="kpi" style="--c:var(--blue)"><div class="k-l">Usuarios</div><div class="k-v mono">${num(t.usuarios)}</div><div class="k-s">+${num(t.usuariosHoy)} hoy${t.baneados ? ` · ${t.baneados} suspendidos` : ''}</div></div>
+    <div class="kpi" style="--c:var(--amber)"><div class="k-l">Premios por pagar</div><div class="k-v mono">${usd(t.pagosPendientesUsd)}</div><div class="k-s">${t.pagosPendientes} pendiente(s) · pagado ${usd(t.pagadoUsd)}</div></div>
+  </div>`;
 
-  async function cargarStats() {
-    try {
-      const res = await fetch(BACKEND + '/admin/stats', {
-        headers: { 'x-admin-password': adminPassword }
-      });
-      if (res.status === 401) return false;
-      statsData = await res.json();
-      renderStats();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
+  const cardSorteo = sa ? `<div class="card">
+    <div class="card-h"><h2>🎯 ${esc(sa.titulo)}</h2><span class="tag t-ok">EN VIVO</span><div class="sp"></div>
+      <button class="btn sm" onclick="ir('sorteo')">✏️ Editar</button><button class="btn sm gold" onclick="sortearAhora(this)">🎲 Sortear ahora</button></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="muted">${num(sa.vendidos)} / ${num(sa.metaBoletos)} boletos</span><b class="gold">${sa.porcentaje}%</b></div>
+    <div class="bar" style="margin-bottom:16px"><i style="width:${Math.min(100, sa.porcentaje)}%"></i></div>
+    <div class="chips" style="margin-bottom:${sa.fechaSorteo ? 14 : 0}px">${sa.premios.map((p, i) => `<div class="chip"><div class="c-e">${medalla(i)}</div><div class="c-m gold">${usdCorto(p.montoUsd)} USD</div><div class="c-d">${esc(p.descripcion)}</div></div>`).join('')}</div>
+    ${sa.fechaSorteo ? `<div class="muted">⏰ Sorteo programado: <b style="color:var(--text)">${fechaLarga(sa.fechaSorteo)}</b> (${cuentaAtras(sa.fechaSorteo)})</div>` : ''}
+  </div>` : '';
 
-  function renderStats() {
-    const s = statsData;
-    document.getElementById('st-usuarios').textContent = s.totalUsuarios;
-    document.getElementById('st-historial').textContent = s.historialSorteos;
-    document.getElementById('last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-MX');
+  const economia = `<div class="card"><div class="card-h"><h2>💰 Economía (estimada)</h2></div>
+    <div class="grid3" style="margin-bottom:6px">
+      <div><div class="muted" style="font-size:12px">Ingresos 14 días</div><div style="font-size:22px;font-weight:800" class="green">${usd(ing.ultimos14Usd)}</div><div class="hint">${num(an.ultimos14)} anuncios</div></div>
+      <div><div class="muted" style="font-size:12px">Premios del sorteo activo</div><div style="font-size:22px;font-weight:800" class="gold">${usd(ing.premiosSorteoUsd)}</div><div class="hint">${sa ? sa.premios.length + ' premio(s)' : '—'}</div></div>
+      <div><div class="muted" style="font-size:12px">Balance estimado</div><div style="font-size:22px;font-weight:800" class="${ing.gananciaEstimadaUsd >= 0 ? 'green' : 'red'}">${ing.gananciaEstimadaUsd === null ? '—' : (ing.gananciaEstimadaUsd >= 0 ? '+' : '−') + usd(Math.abs(ing.gananciaEstimadaUsd))}</div><div class="hint">ingresos 14 d − premios</div></div>
+    </div>
+    <div class="hint">Estimación según el CPM configurado en Ajustes (${usd(ing.cpmUsd)}). Los ingresos reales están en tu panel de Monetag.</div></div>`;
 
-    if (s.sorteoActivo) {
-      const sa = s.sorteoActivo;
-      const pct = Math.round((sa.vendidos / sa.metaBoletos) * 100);
-      const usdRecaudado = (sa.totalRecaudado / 50).toFixed(2);
+  const top = `<div class="card"><div class="card-h"><h2>🏅 Top participantes</h2></div>${s.top.length ? `<div class="tbl-wrap"><table style="min-width:0"><tbody>${s.top.map((u, i) => `<tr><td style="width:36px">${medalla(i)}</td><td class="u-n">${u.username ? '@' + esc(u.username) : 'ID ' + esc(u.userId)}</td><td style="text-align:right"><b>${num(u.boletos)}</b> <span class="muted">boletos</span></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Sin participantes aún</div>'}</div>`;
 
-      document.getElementById('st-vendidos').textContent = sa.vendidos;
-      document.getElementById('st-meta').textContent = 'de ' + sa.metaBoletos + ' meta';
-      document.getElementById('st-recaudado').textContent = sa.totalRecaudado + ' ⭐';
-      document.getElementById('st-recaudado-usd').textContent = '$' + usdRecaudado + ' USD estimado';
+  $('view').innerHTML = alertas + kpis + cardSorteo + `<div class="charts">
+      <div class="card"><div class="card-h"><h2>📺 Anuncios vistos (14 días)</h2></div>${barChart(an.porDia.map(d => ({ dia: d.dia, v: d.n })), '#22c55e')}</div>
+      <div class="card"><div class="card-h"><h2>🎟 Boletos entregados (14 días)</h2></div>${barChart(s.boletosPorDia.map(d => ({ dia: d.dia, v: d.n })), '#A855F7')}</div>
+    </div>
+    <div class="charts"><div class="card"><div class="card-h"><h2>🧭 ¿De dónde vienen los boletos?</h2></div>${hbars(s.porOrigen)}</div>${top}</div>` + economia;
+}
 
-      document.getElementById('sorteo-activo-info').innerHTML = `
-        <div style="margin-bottom:16px">
-          <div style="font-size:18px;font-weight:700;margin-bottom:4px">${sa.titulo}</div>
-          <div style="font-size:12px;color:var(--muted)">ID: ${sa.id}</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:13px;color:var(--muted)">Progreso</span>
-          <span style="font-size:13px;font-weight:700;color:var(--gold)">${pct}%</span>
-        </div>
-        <div class="admin-progress">
-          <div class="admin-progress-fill" style="width:${pct}%"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:20px">
-          <span>${sa.vendidos} vendidos</span>
-          <span>${sa.metaBoletos - sa.vendidos} restantes</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          ${sa.premios.map((p,i) => `
-            <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:20px">${['🥇','🥈','🥉'][i]}</div>
-              <div style="font-size:14px;font-weight:700;color:${['#FFD700','#C0C0C0','#CD7F32'][i]}">\$${(p.monto/50).toFixed(0)} USD</div>
-              <div style="font-size:11px;color:var(--muted)">${p.monto} ⭐</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px">${p.descripcion}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+async function sortearAhora(btn) {
+  const sa = S.stats.sorteoActivo; if (!sa) return;
+  const ok = await confirmar('🎲 Realizar el sorteo ahora', `Se elegirán los ganadores entre <b>${num(sa.vendidos)}</b> boletos y se les avisará por Telegram. <b>No se puede deshacer.</b>`, 'Sí, sortear');
+  if (!ok) return;
+  await accion(btn, async () => {
+    const r = await api('/admin/cerrar-sorteo', { method: 'POST' });
+    toast(`🎉 Sorteo realizado: ${r.ganadores} ganador(es) notificados`);
+    await ir('ganadores');
+  });
+}
 
-      // Llenar campos de edición
-      document.getElementById('edit-titulo').value = sa.titulo;
-      document.getElementById('edit-precio').value = sa.premios[0]?.monto ? '' : '';
-      if (sa.premios[0]) { document.getElementById('p1-desc').value = sa.premios[0].descripcion; document.getElementById('p1-monto').value = sa.premios[0].monto; }
-      if (sa.premios[1]) { document.getElementById('p2-desc').value = sa.premios[1].descripcion; document.getElementById('p2-monto').value = sa.premios[1].monto; }
-      if (sa.premios[2]) { document.getElementById('p3-desc').value = sa.premios[2].descripcion; document.getElementById('p3-monto').value = sa.premios[2].monto; }
+/* ── SORTEO ── */
+function localInput(iso) {
+  if (!iso) return ''; const d = new Date(iso), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function renderSorteo() {
+  const sa = S.stats.sorteoActivo, cfg = S.stats.config;
+  S.draft = sa
+    ? { titulo: sa.titulo, meta: sa.metaBoletos, fecha: localInput(sa.fechaSorteo), premios: sa.premios.map(p => ({ descripcion: p.descripcion, montoUsd: p.montoUsd })) }
+    : { titulo: '', meta: 1500, fecha: '', premios: [{ descripcion: '1er Premio', montoUsd: 2 }, { descripcion: '2do Premio', montoUsd: 1 }, { descripcion: '3er Premio', montoUsd: 0.5 }] };
+  $('view').innerHTML = `
+    ${sa ? `<div class="alert info"><span class="a-i">ℹ️</span><div>Hay un sorteo activo con <b>${num(sa.vendidos)}</b> boletos. Los cambios se aplican al instante. Para crear otro, primero realiza o cancela este.</div></div>`
+         : `<div class="alert warn"><span class="a-i">⚠️</span><div>No hay sorteo activo. Crea uno para que los usuarios puedan ganar boletos.</div></div>`}
+    <div class="card">
+      <div class="card-h"><h2>${sa ? '✏️ Editar sorteo activo' : '➕ Crear nuevo sorteo'}</h2></div>
+      <div class="fld"><label class="lbl" for="f-titulo">Título</label><input class="input" id="f-titulo" maxlength="80" placeholder="Ej: Sorteo #2 — Lucky Stars" value="${esc(S.draft.titulo)}"></div>
+      <div class="grid2">
+        <div class="fld"><label class="lbl" for="f-meta">Meta de boletos</label><input class="input" id="f-meta" type="number" min="2" max="50000" value="${S.draft.meta}" oninput="actualizarEstimador()"><div class="hint">Al llegar a esta cantidad el sorteo se realiza solo.</div></div>
+        <div class="fld"><label class="lbl" for="f-fecha">Fecha del sorteo (opcional)</label><div class="row" style="flex-wrap:nowrap"><input class="input" id="f-fecha" type="datetime-local" value="${S.draft.fecha}"><button class="btn sm" type="button" onclick="$('f-fecha').value=''">Quitar</button></div><div class="hint">Si llega la fecha antes de llenarse la meta, se sortea igual.</div></div>
+      </div>
+      <label class="lbl">Premios (USD)</label>
+      <div id="premios-ed"></div>
+      <div class="row" style="margin-bottom:16px"><button class="btn sm" type="button" onclick="addPremio()">+ Agregar premio</button><span class="hint" id="premios-total"></span></div>
+      <div class="estim" id="estim"></div>
+      <div class="row"><button class="btn primary" onclick="guardarSorteo(this)">${sa ? '💾 Guardar cambios' : '✅ Crear sorteo'}</button></div>
+    </div>
+    ${sa ? `<div class="card"><div class="card-h"><h2>⚡ Acciones del sorteo</h2></div>
+      <div class="row">
+        <button class="btn gold" onclick="sortearAhora(this)">🎲 Realizar sorteo ahora</button>
+        <button class="btn danger" onclick="cancelarSorteo(this)">🚫 Cancelar sorteo (sin ganadores)</button>
+      </div>
+      <div class="hint" style="margin-top:10px">Cada ganador es elegido al azar entre todos los boletos: más boletos = más probabilidad. Una persona solo puede ganar un premio.</div></div>` : ''}`;
+  pintarPremios(); actualizarEstimador();
+}
+function pintarPremios() {
+  $('premios-ed').innerHTML = S.draft.premios.map((p, i) => `
+    <div class="prem-row"><div class="medal">${medalla(i)}</div>
+      <input class="input" aria-label="Descripción premio ${i + 1}" maxlength="60" value="${esc(p.descripcion)}" placeholder="Descripción" oninput="S.draft.premios[${i}].descripcion=this.value">
+      <div class="money-in"><span>$</span><input class="input" aria-label="Monto premio ${i + 1}" type="number" min="0.01" step="0.01" value="${p.montoUsd}" oninput="S.draft.premios[${i}].montoUsd=this.value;actualizarEstimador()"></div>
+      <button class="btn sm danger" type="button" aria-label="Quitar premio" onclick="delPremio(${i})" ${S.draft.premios.length <= 1 ? 'disabled' : ''}>✕</button></div>`).join('');
+}
+function addPremio() { if (S.draft.premios.length >= 10) return toast('Máximo 10 premios', 'err'); S.draft.premios.push({ descripcion: `${S.draft.premios.length + 1}° Premio`, montoUsd: 0.25 }); pintarPremios(); actualizarEstimador(); }
+function delPremio(i) { S.draft.premios.splice(i, 1); pintarPremios(); actualizarEstimador(); }
+function actualizarEstimador() {
+  const total = S.draft.premios.reduce((t, p) => t + (parseFloat(p.montoUsd) || 0), 0);
+  const meta = parseInt($('f-meta').value, 10) || 0, cpm = S.stats.config.cpmUsd;
+  const ingreso = meta * cpm / 1000, bal = ingreso - total, eq = equilibrio(total, cpm);
+  $('premios-total').textContent = `Total en premios: ${usd(total)}`;
+  $('estim').innerHTML = `
+    <div class="e-r"><span class="muted">Costo total de premios</span><b class="gold">${usd(total)}</b></div>
+    <div class="e-r"><span class="muted">Ingreso estimado si se reparten ${num(meta)} boletos con anuncios (CPM ${usd(cpm)})</span><b class="green">${usd(ingreso)}</b></div>
+    <div class="e-r"><span class="muted">Balance estimado</span><b class="${bal >= 0 ? 'green' : 'red'}">${bal >= 0 ? '+' : '−'}${usd(Math.abs(bal))}</b></div>
+    ${eq ? `<div class="e-r"><span class="muted">Boletos necesarios para no perder dinero</span><b class="${meta >= eq ? 'green' : 'red'}">${num(eq)}</b></div>` : ''}
+    <div class="hint" style="margin-top:6px">Estimación orientativa: los boletos por canal o referidos no generan anuncios.</div>`;
+}
+async function guardarSorteo(btn) {
+  const sa = S.stats.sorteoActivo;
+  const body = {
+    titulo: $('f-titulo').value, metaBoletos: parseInt($('f-meta').value, 10),
+    fechaSorteo: $('f-fecha').value ? new Date($('f-fecha').value).toISOString() : null,
+    premios: S.draft.premios.map(p => ({ descripcion: p.descripcion, montoUsd: parseFloat(p.montoUsd) }))
+  };
+  await accion(btn, async () => {
+    await api(sa ? '/admin/editar-sorteo' : '/admin/crear-sorteo', { method: 'POST', body });
+    toast(sa ? '✅ Sorteo actualizado' : '✅ Sorteo creado');
+    await ir(sa ? 'sorteo' : 'resumen');
+  });
+}
+async function cancelarSorteo(btn) {
+  const sa = S.stats.sorteoActivo;
+  const ok = await confirmar('🚫 Cancelar sorteo', `Se cerrará <b>${esc(sa.titulo)}</b> <b>sin elegir ganadores</b> y se perderán sus ${num(sa.vendidos)} boletos. Úsalo solo si hubo un error.`, 'Sí, cancelar');
+  if (!ok) return;
+  await accion(btn, async () => { await api('/admin/cancelar-sorteo', { method: 'POST' }); toast('Sorteo cancelado'); await ir('sorteo'); });
+}
 
-    } else {
-      document.getElementById('st-vendidos').textContent = '—';
-      document.getElementById('st-recaudado').textContent = '—';
-      document.getElementById('sorteo-activo-info').innerHTML = '<div class="alert alert-warning">⚠️ No hay sorteo activo. Crea uno nuevo abajo.</div>';
-    }
+/* ── BOLETOS ── */
+let debounceT;
+function buscarDebounce(fn) { clearTimeout(debounceT); debounceT = setTimeout(fn, 320); }
+async function renderBoletos() {
+  const b = S.boletos;
+  const qs = new URLSearchParams({ q: b.q, origen: b.origen, page: b.page, limit: 25 });
+  const d = await api('/admin/boletos?' + qs);
+  const hayFiltros = b.q || b.origen;
+  const base = $('view').querySelector('#bol-wrap');
+  const tabla = `
+    <div class="tbl-wrap"><table><thead><tr><th>Boleto</th><th>Usuario</th><th>Origen</th><th>Fecha</th><th></th></tr></thead><tbody>
+    ${d.items.length ? d.items.map(t => `<tr>
+      <td class="mono"><b class="gold">#${esc(t.numero)}</b></td>
+      <td><div class="u-n">${t.username ? '@' + esc(t.username) : 'Sin usuario'}</div><div class="u-s">ID ${esc(t.userId)}</div></td>
+      <td><span class="tag t-${esc(t.origen)}">${(ORIGEN[t.origen] || ORIGEN.otro)[0]}</span></td>
+      <td class="muted">${t.ts ? fechaCorta(t.ts) : esc(t.fecha || '—')}</td>
+      <td style="text-align:right"><button class="btn sm danger" title="Eliminar boleto" aria-label="Eliminar boleto ${esc(t.numero)}" onclick="eliminarBoleto('${esc(t.numero)}')">🗑</button></td></tr>`).join('')
+      : `<tr><td colspan="5" class="empty">${hayFiltros ? 'Sin resultados para ese filtro' : 'Todavía no hay boletos'}</td></tr>`}
+    </tbody></table></div>
+    <div class="pager"><button class="btn sm" ${d.page <= 1 ? 'disabled' : ''} onclick="S.boletos.page=${d.page - 1};renderBoletos()">← Anterior</button><span>Página ${d.page} de ${d.pages} · ${num(d.total)} boletos</span><button class="btn sm" ${d.page >= d.pages ? 'disabled' : ''} onclick="S.boletos.page=${d.page + 1};renderBoletos()">Siguiente →</button></div>`;
+  if (base) { $('bol-tabla').innerHTML = tabla; return; }
+  $('view').innerHTML = `<div id="bol-wrap">
+    <div class="card"><div class="card-h"><h2>🎁 Regalar boletos</h2></div>
+      <div class="row" style="flex-wrap:nowrap"><input class="input" id="g-user" placeholder="@usuario o ID de Telegram"><input class="input" id="g-cant" type="number" min="1" max="50" value="1" style="max-width:100px" aria-label="Cantidad"><button class="btn primary" onclick="regalar(this)">Regalar</button></div>
+      <div class="hint">El usuario debe haber usado el bot al menos una vez. Recibirá un aviso por Telegram.</div></div>
+    <div class="card"><div class="card-h"><h2>🎟 Boletos del sorteo activo</h2></div>
+      <div class="toolbar"><input class="input" id="b-q" placeholder="Buscar por @usuario, ID o número…" value="${esc(b.q)}" oninput="S.boletos.q=this.value;S.boletos.page=1;buscarDebounce(renderBoletos)">
+        <select class="input" id="b-o" onchange="S.boletos.origen=this.value;S.boletos.page=1;renderBoletos()"><option value="">Todos los orígenes</option>${Object.entries(ORIGEN).map(([k, v]) => `<option value="${k}" ${b.origen === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select>
+        <button class="btn" onclick="exportarCSV(this)">⬇ Exportar CSV</button></div>
+      <div id="bol-tabla"></div></div></div>`;
+  $('bol-tabla').innerHTML = tabla;
+}
+async function eliminarBoleto(n) {
+  if (!await confirmar('Eliminar boleto #' + n, 'El boleto saldrá del sorteo. Úsalo solo para casos de fraude o error.', 'Eliminar')) return;
+  await accion(null, async () => { await api('/admin/boleto-eliminar', { method: 'POST', body: { numero: n } }); toast('Boleto eliminado'); await renderBoletos(); });
+}
+async function regalar(btn) {
+  await accion(btn, async () => {
+    const r = await api('/admin/dar-boletos', { method: 'POST', body: { usuario: $('g-user').value, cantidad: $('g-cant').value } });
+    toast(`🎁 ${r.entregados} boleto(s) regalados a ${r.usuario}`); $('g-user').value = ''; await renderBoletos();
+  });
+}
+async function exportarCSV(btn) {
+  await accion(btn, async () => {
+    const d = await api('/admin/boletos?all=1&origen=' + encodeURIComponent(S.boletos.origen) + '&q=' + encodeURIComponent(S.boletos.q));
+    const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const filas = [['numero', 'user_id', 'username', 'origen', 'fecha'].join(',')].concat(d.items.reverse().map(t => [t.numero, t.userId, t.username, t.origen, t.ts || t.fecha].map(celda).join(',')));
+    const blob = new Blob(['﻿' + filas.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `boletos-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+    toast(`Exportados ${d.items.length} boletos`);
+  });
+}
 
-    // Tabla de compradores
-    const boletos = s.boletos || [];
-    document.getElementById('total-compradores').textContent = boletos.length + ' boletos';
-    const tbody = document.getElementById('tabla-compradores');
-    if (boletos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-table">No hay boletos aún</td></tr>';
-    } else {
-      tbody.innerHTML = boletos.map((b, i) => `
-        <tr>
-          <td style="color:var(--muted)">${i + 1}</td>
-          <td class="boleto-num-td">#${b.numero}</td>
-          <td class="username-td">@${b.username || 'usuario'}</td>
-          <td><span class="tag ${b.esBoletoGratis ? 'tag-gratis' : 'tag-comprado'}">${b.esBoletoGratis ? 'Gratis' : 'Comprado'}</span></td>
-          <td style="color:var(--muted)">${b.fecha}</td>
-        </tr>
-      `).join('');
-    }
-  }
+/* ── USUARIOS ── */
+async function renderUsuarios() {
+  const u = S.usuarios;
+  const qs = new URLSearchParams({ q: u.q, orden: u.orden, page: u.page, baneados: u.baneados ? '1' : '0' });
+  const d = await api('/admin/usuarios?' + qs);
+  const tabla = `<div class="tbl-wrap"><table style="min-width:760px"><thead><tr><th>Usuario</th><th>Boletos</th><th>Anuncios</th><th>Invitados</th><th>Registro</th><th>Wallet</th><th></th></tr></thead><tbody>
+    ${d.items.length ? d.items.map(x => `<tr>
+      <td><div class="u-n">${x.username ? '@' + esc(x.username) : esc(x.firstName || 'Sin nombre')} ${x.baneado ? '<span class="tag t-ban">Suspendido</span>' : ''}</div><div class="u-s">ID ${esc(x.userId)}${x.referidoPor ? ' · invitado por ' + esc(x.referidoPor) : ''}</div></td>
+      <td class="mono"><b>${num(x.boletos)}</b></td><td class="mono">${num(x.adsTotal)}</td><td class="mono">${num(x.referidos)}</td>
+      <td class="muted">${fechaCorta(x.fechaRegistro)}</td>
+      <td>${x.wallet ? `<button class="btn sm" data-v="${esc(x.wallet)}" onclick="copiar(this.dataset.v)" title="${esc(x.wallet)}">📋 Copiar</button>` : '<span class="muted">—</span>'}</td>
+      <td style="text-align:right"><button class="btn sm ${x.baneado ? 'success' : 'danger'}" onclick="banear('${esc(x.userId)}',${!x.baneado})">${x.baneado ? 'Reactivar' : 'Suspender'}</button></td></tr>`).join('')
+      : '<tr><td colspan="7" class="empty">No hay usuarios con ese filtro</td></tr>'}
+    </tbody></table></div>
+    <div class="pager"><button class="btn sm" ${d.page <= 1 ? 'disabled' : ''} onclick="S.usuarios.page=${d.page - 1};renderUsuarios()">← Anterior</button><span>Página ${d.page} de ${d.pages} · ${num(d.total)} usuarios</span><button class="btn sm" ${d.page >= d.pages ? 'disabled' : ''} onclick="S.usuarios.page=${d.page + 1};renderUsuarios()">Siguiente →</button></div>`;
+  if ($('usr-tabla')) { $('usr-tabla').innerHTML = tabla; return; }
+  $('view').innerHTML = `<div class="card"><div class="card-h"><h2>👥 Usuarios del bot</h2></div>
+    <div class="toolbar"><input class="input" placeholder="Buscar por @usuario, nombre o ID…" value="${esc(u.q)}" oninput="S.usuarios.q=this.value;S.usuarios.page=1;buscarDebounce(renderUsuarios)">
+      <select class="input" onchange="S.usuarios.orden=this.value;S.usuarios.page=1;renderUsuarios()">
+        <option value="recientes" ${u.orden === 'recientes' ? 'selected' : ''}>Más recientes</option><option value="boletos" ${u.orden === 'boletos' ? 'selected' : ''}>Más boletos (sorteo activo)</option><option value="anuncios" ${u.orden === 'anuncios' ? 'selected' : ''}>Más anuncios vistos</option></select>
+      <label class="chk"><input type="checkbox" ${u.baneados ? 'checked' : ''} onchange="S.usuarios.baneados=this.checked;S.usuarios.page=1;renderUsuarios()"> Solo suspendidos</label></div>
+    <div id="usr-tabla"></div></div>`;
+  $('usr-tabla').innerHTML = tabla;
+}
+async function banear(id, ban) {
+  const ok = await confirmar(ban ? 'Suspender usuario' : 'Reactivar usuario', ban ? 'No podrá ganar más boletos y <b>se eliminarán sus boletos del sorteo activo</b>.' : 'Podrá volver a participar.', ban ? 'Suspender' : 'Reactivar', ban);
+  if (!ok) return;
+  await accion(null, async () => { const r = await api('/admin/banear', { method: 'POST', body: { userId: id, ban } }); toast(ban ? `Suspendido (${r.boletosRetirados} boletos retirados)` : 'Usuario reactivado'); await renderUsuarios(); });
+}
+function copiar(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copiado'), () => toast('No se pudo copiar', 'err')); }
 
-  function toggleEditar() {
-    editarVisible = !editarVisible;
-    document.getElementById('editar-section').style.display = editarVisible ? 'block' : 'none';
-  }
+/* ── GANADORES ── */
+async function renderGanadores() {
+  const hist = await api('/admin/historial');
+  S._hist = hist;
+  if (!hist.length) { $('view').innerHTML = '<div class="card"><div class="empty">Aún no se ha realizado ningún sorteo.</div></div>'; return; }
+  $('view').innerHTML = hist.map(h => {
+    const pend = h.ganadores.filter(g => !g.pagado).length;
+    return `<div class="card">
+      <div class="winner-h"><h3>${h.cancelado ? '🚫' : '🏆'} ${esc(h.titulo)}</h3>
+        <span class="muted">${fechaLarga(h.fecha)}</span>
+        ${h.cancelado ? '<span class="tag t-ban">Cancelado</span>' : `<span class="muted">${num(h.totalBoletos)} boletos · ${num(h.participantes)} participantes</span>${pend ? `<span class="tag t-pend">${pend} por pagar</span>` : '<span class="tag t-ok">Todo pagado</span>'}`}</div>
+      ${h.cancelado ? '' : h.ganadores.length ? `<div class="tbl-wrap"><table style="min-width:720px"><thead><tr><th>Premio</th><th>Ganador</th><th>Boleto</th><th>Wallet</th><th>Estado</th><th></th></tr></thead><tbody>
+        ${h.ganadores.map(g => `<tr>
+          <td><span style="font-size:18px">${medalla(g.premio.lugar - 1)}</span> <b class="gold">${usd(g.premio.montoUsd)}</b><div class="u-s">${esc(g.premio.descripcion)}</div></td>
+          <td>${g.username ? `<a class="u-n" style="color:var(--blue);text-decoration:none" href="https://t.me/${esc(g.username)}" target="_blank" rel="noopener">@${esc(g.username)}</a>` : `<span class="u-n">${esc(g.nombre || 'Sin usuario')}</span>`}<div class="u-s">ID ${esc(g.userId)}</div></td>
+          <td class="mono">#${esc(g.numero)}</td>
+          <td>${g.wallet ? `<div style="max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(g.wallet)}">${esc(g.wallet)}</div><button class="btn sm" style="margin-top:4px" data-v="${esc(g.wallet)}" onclick="copiar(this.dataset.v)">📋 Copiar</button>` : '<span class="tag t-pend">⚠ Sin wallet</span><div class="u-s">Aún no usa /wallet</div>'}</td>
+          <td>${g.pagado ? `<span class="tag t-ok">Pagado</span><div class="u-s">${fechaCorta(g.pagadoEn)}${g.txid ? '<br>Ref: ' + esc(g.txid) : ''}</div>` : '<span class="tag t-pend">Pendiente</span>'}</td>
+          <td style="text-align:right"><button class="btn sm ${g.pagado ? '' : 'success'}" onclick="pagoModal('${esc(h.id)}','${esc(g.userId)}',${g.pagado ? 'true' : 'false'})">${g.pagado ? 'Editar' : '💸 Marcar pagado'}</button></td></tr>`).join('')}
+        </tbody></table></div>` : '<div class="empty">Este sorteo no tuvo participantes.</div>'}
+    </div>`;
+  }).join('');
+}
+async function pagoModal(hid, uid, yaPagado) {
+  const g = S._hist.find(h => h.id === hid).ganadores.find(x => x.userId === uid);
+  const r = await modal({
+    titulo: yaPagado ? 'Editar pago' : '💸 Registrar pago',
+    html: `<p>${medalla(g.premio.lugar - 1)} <b class="gold">${usd(g.premio.montoUsd)}</b> para ${g.username ? '@' + esc(g.username) : 'ID ' + esc(g.userId)}${g.wallet ? `<br><span class="u-s">Wallet: ${esc(g.wallet)}</span>` : ''}</p>
+      <div class="fld"><label class="lbl">Referencia / TXID</label><input class="input" data-f="txid" maxlength="200" value="${esc(g.txid || '')}" placeholder="Hash de la transacción"></div>
+      <div class="fld"><label class="lbl">Nota interna</label><input class="input" data-f="nota" maxlength="300" value="${esc(g.nota || '')}" placeholder="Opcional"></div>
+      <label class="chk"><input type="checkbox" data-f="notificar" ${yaPagado ? '' : 'checked'}> Avisar al ganador por Telegram</label>`,
+    botones: [{ texto: 'Cancelar', valor: null }].concat(yaPagado ? [{ texto: 'Marcar pendiente', clase: 'danger', valor: 'pend' }] : []).concat([{ texto: yaPagado ? 'Guardar' : 'Marcar pagado', clase: 'primary', valor: 'pagar' }])
+  });
+  if (!r) return;
+  const d = S._modalDatos || {};
+  await accion(null, async () => {
+    await api('/admin/ganador-pago', { method: 'POST', body: { historialId: hid, userId: uid, pagado: r === 'pagar', txid: d.txid, nota: d.nota, notificar: !!d.notificar && r === 'pagar' } });
+    toast(r === 'pagar' ? '✅ Pago registrado' : 'Marcado como pendiente'); await renderGanadores(); await cargarStats(true);
+  });
+}
 
-  async function guardarEdicion() {
-    const body = {
-      titulo: document.getElementById('edit-titulo').value,
-      premios: [
-        { lugar: 1, descripcion: document.getElementById('p1-desc').value, monto: parseInt(document.getElementById('p1-monto').value), moneda: 'Stars' },
-        { lugar: 2, descripcion: document.getElementById('p2-desc').value, monto: parseInt(document.getElementById('p2-monto').value), moneda: 'Stars' },
-        { lugar: 3, descripcion: document.getElementById('p3-desc').value, monto: parseInt(document.getElementById('p3-monto').value), moneda: 'Stars' }
-      ]
-    };
-    const metaBoletos = parseInt(document.getElementById('edit-meta').value);
-    const precio = parseInt(document.getElementById('edit-precio').value);
-    if (metaBoletos) body.metaBoletos = metaBoletos;
-    if (precio) body.precioPorBoleto = precio;
+/* ── AJUSTES ── */
+function renderAjustes() {
+  const c = S.stats.config;
+  $('view').innerHTML = `
+  <div class="card"><div class="card-h"><h2>📺 Anuncios y boletos</h2></div>
+    <div class="grid2">
+      <div class="fld"><label class="lbl" for="c-lim">Anuncios por usuario al día</label><input class="input" id="c-lim" type="number" min="1" max="50" value="${c.adLimitDiario}"><div class="hint">Cada anuncio = 1 boleto. Más anuncios = más ingresos, pero sorteos que se llenan más rápido.</div></div>
+      <div class="fld"><label class="lbl" for="c-cool">Espera entre anuncios (segundos)</label><input class="input" id="c-cool" type="number" min="0" max="300" value="${c.cooldownSeg}"><div class="hint">Evita que alguien registre boletos sin ver el anuncio.</div></div>
+    </div>
+    <div class="fld" style="max-width:340px"><label class="lbl" for="c-cpm">CPM estimado (USD por 1000 anuncios)</label><div class="money-in"><span>$</span><input class="input" id="c-cpm" type="number" min="0" step="0.1" value="${c.cpmUsd}"></div><div class="hint">Solo se usa para las estimaciones del panel. Mira tu CPM real en Monetag.</div></div>
+  </div>
+  <div class="card"><div class="card-h"><h2>💬 Mensaje del bot</h2></div>
+    <div class="fld"><label class="lbl" for="c-aviso">Aviso destacado en la bienvenida (opcional)</label><textarea class="input" id="c-aviso" maxlength="300" placeholder="Ej: ¡Este fin de semana sorteo extra!">${esc(c.avisoBienvenida)}</textarea><div class="hint">Aparece al final del mensaje de /start. Máx. 300 caracteres.</div></div>
+    <button class="btn primary" onclick="guardarConfig(this)">💾 Guardar ajustes</button></div>
+  <div class="card"><div class="card-h"><h2>🧩 Cómo funciona</h2></div>
+    <ul style="padding-left:18px;color:var(--muted);display:grid;gap:7px">
+      <li>El usuario ve un anuncio en la Mini App y recibe <b style="color:var(--text)">1 boleto</b>; el servidor valida que la petición venga de Telegram.</li>
+      <li>Al llenarse la <b style="color:var(--text)">meta</b> (o llegar la fecha) el sorteo se realiza solo y los ganadores reciben un mensaje para registrar su <code>/wallet</code>.</li>
+      <li>Cuando envíes el dinero, márcalo como pagado en <b style="color:var(--text)">Ganadores</b>: el ganador recibe el aviso con tu referencia.</li>
+      <li>Si detectas trampa, <b style="color:var(--text)">suspende</b> al usuario: se borran sus boletos del sorteo activo.</li>
+    </ul></div>`;
+}
+async function guardarConfig(btn) {
+  await accion(btn, async () => {
+    await api('/admin/config', { method: 'POST', body: { adLimitDiario: $('c-lim').value, cooldownSeg: $('c-cool').value, cpmUsd: $('c-cpm').value, avisoBienvenida: $('c-aviso').value } });
+    toast('✅ Ajustes guardados'); await cargarStats(true); renderAjustes();
+  });
+}
 
-    try {
-      const res = await fetch(BACKEND + '/admin/editar-sorteo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.ok) {
-        mostrarToast('✅ Sorteo actualizado', 'success');
-        await cargarStats();
-        toggleEditar();
-      } else {
-        mostrarToast('Error: ' + data.error, 'error');
-      }
-    } catch (e) {
-      mostrarToast('Error de conexión', 'error');
-    }
-  }
-
-  async function crearSorteo() {
-    const body = {
-      titulo: document.getElementById('new-titulo').value || 'Nuevo Sorteo Lucky Stars',
-      precioPorBoleto: parseInt(document.getElementById('new-precio').value) || 50,
-      metaBoletos: parseInt(document.getElementById('new-meta').value) || 100,
-      premios: [
-        { lugar: 1, descripcion: document.getElementById('n1-desc').value, monto: parseInt(document.getElementById('n1-monto').value), moneda: 'Stars' },
-        { lugar: 2, descripcion: document.getElementById('n2-desc').value, monto: parseInt(document.getElementById('n2-monto').value), moneda: 'Stars' },
-        { lugar: 3, descripcion: document.getElementById('n3-desc').value, monto: parseInt(document.getElementById('n3-monto').value), moneda: 'Stars' }
-      ]
-    };
-
-    try {
-      const res = await fetch(BACKEND + '/admin/crear-sorteo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPassword },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.ok) {
-        mostrarToast('✅ Sorteo creado', 'success');
-        await cargarStats();
-      } else {
-        mostrarToast('Error: ' + data.error, 'error');
-      }
-    } catch (e) {
-      mostrarToast('Error de conexión', 'error');
-    }
-  }
-
-  async function cerrarSorteo() {
-    if (!confirm('¿Realizar el sorteo AHORA? Esto elegirá ganadores aleatoriamente y no se puede deshacer.')) return;
-    try {
-      const res = await fetch(BACKEND + '/admin/cerrar-sorteo', {
-        method: 'POST',
-        headers: { 'x-admin-password': adminPassword }
-      });
-      const data = await res.json();
-      if (data.ok) {
-        mostrarToast('🎉 Sorteo realizado. Ganadores notificados.', 'success');
-        await cargarStats();
-      } else {
-        mostrarToast('Error: ' + data.error, 'error');
-      }
-    } catch (e) {
-      mostrarToast('Error de conexión', 'error');
-    }
-  }
-
-  function mostrarToast(msg, tipo) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.className = 'toast ' + tipo + ' show';
-    setTimeout(() => toast.classList.remove('show'), 3500);
-  }
+/* ── arranque ── */
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (S.pass && VISTAS[h] && h !== S.view) ir(h); });
+(async function init() {
+  const guardada = ss.get('ls_admin');
+  if (guardada) { $('pass').value = guardada; await login(); }
+})();
 </script>
 </body>
 </html>

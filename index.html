@@ -147,7 +147,7 @@
     /* PREMIOS */
     .premios-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
       gap: 8px;
       margin-bottom: 20px;
     }
@@ -173,6 +173,7 @@
     .premio-monto.bronze { color: #CD7F32; }
     .premio-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
     .premio-stars { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .sorteo-fecha { text-align: center; font-size: 12px; color: var(--gold); margin: -10px 0 16px; font-weight: 600; }
 
     /* PROGRESO */
     .progress-section { margin-bottom: 20px; }
@@ -658,12 +659,13 @@
     <div class="sorteo-main">
       <div class="sorteo-badge"><span class="dot-live"></span> EN VIVO</div>
       <div class="sorteo-titulo" id="sorteo-titulo">Cargando...</div>
+      <div class="sorteo-fecha" id="sorteo-fecha" style="display:none"></div>
 
       <div class="premios-grid" id="premios-grid"></div>
 
       <div class="progress-section">
         <div class="progress-header">
-          <span class="progress-label">Boletos vendidos</span>
+          <span class="progress-label">Boletos repartidos</span>
           <span class="progress-pct" id="progress-pct">0%</span>
         </div>
         <div class="progress-bar">
@@ -740,7 +742,7 @@
         <div class="ref-stats">
           <div class="ref-stat">
             <div class="ref-stat-val" id="ref-count">0</div>
-            <div class="ref-stat-label">Referidos que compraron</div>
+            <div class="ref-stat-label">Amigos que vieron su 1er anuncio</div>
           </div>
           <div class="ref-stat">
             <div class="ref-stat-val" id="ref-boletos">0</div>
@@ -751,7 +753,7 @@
         <div class="ref-bonus-list">
           <div class="ref-bonus">
             <span class="ref-bonus-icon">🎁</span>
-            <span class="ref-bonus-txt">Por cada amigo que compre</span>
+            <span class="ref-bonus-txt">Por cada amigo que vea su 1er anuncio</span>
             <span class="ref-bonus-reward">+1 boleto</span>
           </div>
           <div class="ref-bonus">
@@ -837,11 +839,19 @@
     // Premios
     const emojis = ['🥇', '🥈', '🥉'];
     const clases = ['gold', 'silver', 'bronze'];
+    const fmtUsd = n => Number.isInteger(n) ? String(n) : n.toFixed(2);
+    const fechaEl = document.getElementById('sorteo-fecha');
+    if (sorteoData.fechaSorteo) {
+      fechaEl.style.display = 'block';
+      fechaEl.textContent = '⏰ Sorteo: ' + new Date(sorteoData.fechaSorteo).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' });
+    } else {
+      fechaEl.style.display = 'none';
+    }
     const grid = document.getElementById('premios-grid');
     grid.innerHTML = sorteoData.premios.map((p, i) => `
-      <div class="premio-card ${clases[i]}">
-        <div class="premio-emoji">${emojis[i]}</div>
-        <div class="premio-monto ${clases[i]}">$${p.montoUsd || (p.monto / 50).toFixed(0)} USD</div>
+      <div class="premio-card ${clases[i] || 'bronze'}">
+        <div class="premio-emoji">${emojis[i] || '🏅'}</div>
+        <div class="premio-monto ${clases[i] || 'bronze'}">$${fmtUsd(p.montoUsd)} USD</div>
         <div class="premio-desc">${p.descripcion}</div>
       </div>
     `).join('');
@@ -851,6 +861,8 @@
       if (btnAd) { btnAd.disabled = true; btnAd.textContent = '✅ Sorteo completado'; }
     }
   }
+
+  const ETIQUETA_ORIGEN = { ad: '📺 Anuncio', canal: '📣 Canal', referido: '👥 Referido', bonus: '🌟 Bonus', regalo: '🎁 Regalo', compra: 'Comprado' };
 
   async function cargarMisBoletosUI() {
     try {
@@ -864,7 +876,7 @@
       lista.innerHTML = boletos.map(b => `
         <div class="boleto-item">
           <span class="boleto-num">#${b.numero}</span>
-          <span class="boleto-tag ${b.esBoletoGratis ? 'gratis' : 'comprado'}">${b.esBoletoGratis ? 'Gratis' : 'Comprado'}</span>
+          <span class="boleto-tag ${b.origen === 'compra' ? 'comprado' : 'gratis'}">${ETIQUETA_ORIGEN[b.origen] || 'Gratis'}</span>
         </div>
       `).join('');
     } catch (e) {}
@@ -880,7 +892,7 @@
       const res = await fetch(BACKEND + '/api/reclamar-gratis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ initData: tg.initData })
       });
       const data = await res.json();
       if (data.ok) {
@@ -933,12 +945,18 @@
     btn.disabled = true;
     btn.textContent = '⏳ Cargando anuncio...';
     try {
-      await show_11964434();
+      try {
+        await show_11964434();
+      } catch (adErr) {
+        mostrarToast('Mira el anuncio completo para ganar tu boleto', 'error');
+        actualizarAdUI();
+        return;
+      }
       btn.textContent = '⏳ Registrando boleto...';
       const res = await fetch(BACKEND + '/api/ad-reward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ initData: tg ? tg.initData : '' })
       });
       const data = await res.json();
       if (data.ok) {
@@ -952,7 +970,7 @@
         actualizarAdUI();
       }
     } catch (e) {
-      mostrarToast('Error al mostrar anuncio', 'error');
+      mostrarToast('Error de conexión. Intenta de nuevo', 'error');
       actualizarAdUI();
     }
   }
