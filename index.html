@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Lucky Stars — Sorteos</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="//libtl.com/sdk.js" data-zone="11964434" data-sdk="show_11964434"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -521,6 +522,76 @@
     .ref-bonus-txt { flex: 1; color: var(--muted); }
     .ref-bonus-reward { font-weight: 700; color: var(--gold); font-size: 12px; }
 
+    /* AD REWARD */
+    .ad-section {
+      background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02));
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .ad-section h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #22c55e;
+      margin-bottom: 6px;
+    }
+
+    .ad-section .ad-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .ad-counter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .ad-counter strong {
+      color: #22c55e;
+      font-size: 18px;
+    }
+
+    .btn-ad {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 24px rgba(34,197,94,0.3);
+    }
+
+    .btn-ad:active { transform: scale(0.98); }
+    .btn-ad:disabled { background: #2a2a4a; color: #555; cursor: not-allowed; box-shadow: none; }
+
+    .ad-progress-bar {
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .ad-progress-fill {
+      background: linear-gradient(90deg, #16a34a, #22c55e);
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
     /* TOAST */
     .toast {
       position: fixed;
@@ -573,7 +644,7 @@
       <span class="logo-text">Lucky Stars</span>
       <span class="logo-star">⭐</span>
     </div>
-    <div class="header-sub">Sorteos con Telegram Stars</div>
+    <div class="header-sub">Sorteos gratis — gana dinero real 💰</div>
   </div>
 
   <div id="loading" class="loading">
@@ -599,7 +670,7 @@
           <div class="progress-fill" id="progress-fill" style="width:0%"></div>
         </div>
         <div class="progress-counts">
-          <span id="progress-vendidos">0 vendidos</span>
+          <span id="progress-vendidos">0 repartidos</span>
           <span id="progress-restantes">100 restantes</span>
         </div>
       </div>
@@ -607,37 +678,33 @@
       <div class="stats-row">
         <div class="stat-box">
           <div class="stat-val" id="stat-vendidos">0</div>
-          <div class="stat-label">Vendidos</div>
+          <div class="stat-label">Repartidos</div>
         </div>
         <div class="stat-box">
           <div class="stat-val" id="stat-restantes">—</div>
           <div class="stat-label">Restantes</div>
         </div>
         <div class="stat-box">
-          <div class="stat-val" id="stat-precio">50⭐</div>
+          <div class="stat-val" style="color:#22c55e">GRATIS</div>
           <div class="stat-label">Por boleto</div>
         </div>
       </div>
 
-      <div class="compra-section">
-        <div class="compra-label">¿CUÁNTOS BOLETOS QUIERES?</div>
-        <div class="qty-controls">
-          <button class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
-          <div class="qty-num" id="qty-num">1</div>
-          <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
-        </div>
-        <div class="precio-row">
-          <span class="precio-txt">Total a pagar</span>
-          <span class="precio-val" id="precio-val">50 ⭐</span>
-        </div>
-      </div>
-
-      <button class="btn-comprar" id="btn-comprar" onclick="comprarBoletos()">
-        🎟 Comprar Boletos
-      </button>
-
       <button class="btn-gratis" onclick="reclamarGratis()">
-        🎁 Reclamar boleto gratis (únete al canal)
+        🎁 Boleto gratis — únete al canal
+      </button>
+    </div>
+
+    <!-- AD REWARD SECTION -->
+    <div class="ad-section" id="ad-section" style="display:none">
+      <h3>📺 GANA BOLETOS GRATIS</h3>
+      <p class="ad-desc">Mira un anuncio corto y recibe <strong>1 boleto gratis</strong> al instante</p>
+      <div class="ad-progress-bar">
+        <div class="ad-progress-fill" id="ad-progress-fill" style="width:0%"></div>
+      </div>
+      <p class="ad-counter" id="ad-counter">0 / 5 anuncios hoy</p>
+      <button class="btn-ad" id="btn-ad" onclick="verAnuncio()">
+        📺 Ver anuncio = 1 boleto 🎟
       </button>
     </div>
 
@@ -711,11 +778,10 @@
   if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0D0D1A'); tg.setBackgroundColor('#0D0D1A'); }
 
   const BACKEND = 'https://luckystars-backend.onrender.com';
-  const STARS_PER_USD = 50;
-  let cantidad = 1;
   let sorteoData = null;
   let userId = null;
   let linkReferido = '';
+  let adStatus = { adsHoy: 0, limite: 5, restantes: 5 };
 
   // Obtener userId de Telegram
   if (tg?.initDataUnsafe?.user) {
@@ -745,7 +811,10 @@
       }
 
       renderSorteo();
-      if (userId) cargarMisBoletosUI();
+      if (userId) {
+        cargarMisBoletosUI();
+        await cargarAdStatus();
+      }
 
       document.getElementById('loading').style.display = 'none';
       document.getElementById('contenido').style.display = 'block';
@@ -759,10 +828,10 @@
     document.getElementById('sorteo-titulo').textContent = sorteoData.titulo;
     document.getElementById('stat-vendidos').textContent = sorteoData.vendidos;
     document.getElementById('stat-restantes').textContent = sorteoData.restantes;
-    document.getElementById('stat-precio').innerHTML = '$' + (sorteoData.precioPorBoleto / 50).toFixed(2) + ' <small style="font-size:10px;color:var(--muted)">' + sorteoData.precioPorBoleto + '⭐</small>';
+    // Precio ya no aplica — boletos son gratis
     document.getElementById('progress-pct').textContent = sorteoData.porcentaje + '%';
     document.getElementById('progress-fill').style.width = sorteoData.porcentaje + '%';
-    document.getElementById('progress-vendidos').textContent = sorteoData.vendidos + ' vendidos';
+    document.getElementById('progress-vendidos').textContent = sorteoData.vendidos + ' repartidos';
     document.getElementById('progress-restantes').textContent = sorteoData.restantes + ' restantes';
 
     // Premios
@@ -772,31 +841,15 @@
     grid.innerHTML = sorteoData.premios.map((p, i) => `
       <div class="premio-card ${clases[i]}">
         <div class="premio-emoji">${emojis[i]}</div>
-        <div class="premio-monto ${clases[i]}">$${(p.monto / 50).toFixed(0)} USD</div>
-        <div class="premio-stars">${p.monto} ⭐</div>
+        <div class="premio-monto ${clases[i]}">$${p.montoUsd || (p.monto / 50).toFixed(0)} USD</div>
         <div class="premio-desc">${p.descripcion}</div>
       </div>
     `).join('');
 
-    actualizarPrecio();
-
     if (!sorteoData.activo) {
-      document.getElementById('btn-comprar').disabled = true;
-      document.getElementById('btn-comprar').textContent = '✅ Sorteo completado';
+      const btnAd = document.getElementById('btn-ad');
+      if (btnAd) { btnAd.disabled = true; btnAd.textContent = '✅ Sorteo completado'; }
     }
-  }
-
-  function actualizarPrecio() {
-    document.getElementById('qty-num').textContent = cantidad;
-    const totalStars = cantidad * (sorteoData?.precioPorBoleto || 50);
-    const totalUsd = (totalStars / 50).toFixed(2);
-    document.getElementById('precio-val').innerHTML = '$' + totalUsd + ' USD <small style="font-size:13px;color:var(--muted)">(' + totalStars + ' ⭐)</small>';
-  }
-
-  function cambiarCantidad(delta) {
-    const max = sorteoData ? sorteoData.restantes : 99;
-    cantidad = Math.max(1, Math.min(cantidad + delta, max));
-    actualizarPrecio();
   }
 
   async function cargarMisBoletosUI() {
@@ -815,44 +868,6 @@
         </div>
       `).join('');
     } catch (e) {}
-  }
-
-  async function comprarBoletos() {
-    if (!tg || !tg.initDataUnsafe?.user) {
-      mostrarToast('Abre desde Telegram', 'error');
-      return;
-    }
-    if (cantidad > sorteoData.restantes) {
-      mostrarToast('Solo quedan ' + sorteoData.restantes + ' boletos', 'error');
-      return;
-    }
-
-    mostrarToast('Generando pago...', 'info');
-
-    try {
-      const res = await fetch(BACKEND + '/api/crear-invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, cantidad })
-      });
-      const data = await res.json();
-
-      if (data.invoiceUrl) {
-        tg.openInvoice(data.invoiceUrl, async (status) => {
-          if (status === 'paid') {
-            mostrarToast('✅ ¡Compra exitosa!', 'success');
-            cantidad = 1;
-            await cargarTodo();
-          } else {
-            mostrarToast('Pago cancelado', 'error');
-          }
-        });
-      } else {
-        mostrarToast('Error: ' + (data.error || 'desconocido'), 'error');
-      }
-    } catch (e) {
-      mostrarToast('Error de conexión', 'error');
-    }
   }
 
   async function reclamarGratis() {
@@ -876,6 +891,69 @@
       }
     } catch (e) {
       mostrarToast('Error de conexión', 'error');
+    }
+  }
+
+  async function cargarAdStatus() {
+    try {
+      const res = await fetch(BACKEND + '/api/ad-status/' + userId);
+      adStatus = await res.json();
+      actualizarAdUI();
+    } catch (e) {
+      console.error('Error cargando ad status', e);
+    }
+  }
+
+  function actualizarAdUI() {
+    const section = document.getElementById('ad-section');
+    section.style.display = 'block';
+    const pct = (adStatus.adsHoy / adStatus.limite) * 100;
+    document.getElementById('ad-progress-fill').style.width = pct + '%';
+    document.getElementById('ad-counter').textContent = adStatus.adsHoy + ' / ' + adStatus.limite + ' anuncios hoy';
+    const btn = document.getElementById('btn-ad');
+    if (adStatus.restantes <= 0) {
+      btn.disabled = true;
+      btn.textContent = '✅ Límite diario alcanzado — vuelve mañana';
+    } else {
+      btn.disabled = false;
+      btn.textContent = '📺 Ver anuncio = 1 boleto 🎟';
+    }
+  }
+
+  async function verAnuncio() {
+    if (!userId) {
+      mostrarToast('Abre desde Telegram', 'error');
+      return;
+    }
+    if (adStatus.restantes <= 0) {
+      mostrarToast('Ya alcanzaste el límite de hoy', 'error');
+      return;
+    }
+    const btn = document.getElementById('btn-ad');
+    btn.disabled = true;
+    btn.textContent = '⏳ Cargando anuncio...';
+    try {
+      await show_11964434();
+      btn.textContent = '⏳ Registrando boleto...';
+      const res = await fetch(BACKEND + '/api/ad-reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        adStatus.adsHoy = data.adsHoy;
+        adStatus.restantes = data.restantes;
+        actualizarAdUI();
+        mostrarToast('🎟 ¡Boleto #' + data.numero + ' obtenido!', 'success');
+        await cargarTodo();
+      } else {
+        mostrarToast(data.error || 'Error al registrar', 'error');
+        actualizarAdUI();
+      }
+    } catch (e) {
+      mostrarToast('Error al mostrar anuncio', 'error');
+      actualizarAdUI();
     }
   }
 
