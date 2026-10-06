@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Lucky Stars — Sorteos</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="//libtl.com/sdk.js" data-zone="11964434" data-sdk="show_11964434"></script>
@@ -10,1003 +10,453 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
     :root {
-      --gold: #FFD700;
-      --gold2: #FFA500;
-      --purple: #7C3AED;
-      --purple2: #A855F7;
-      --pink: #EC4899;
-      --dark: #0D0D1A;
-      --dark2: #13132A;
-      --dark3: #1A1A35;
-      --card: #16162E;
-      --border: rgba(124,58,237,0.3);
-      --text: #F1F0FF;
-      --muted: #8B85A0;
+      --bg: #0A0A16; --card: #13132B; --card2: #1A1A3A;
+      --line: rgba(255,255,255,.08); --text: #F4F3FF; --muted: #9A95B5; --faint: #6B6788;
+      --gold: #FFD54A; --gold2: #FFA726; --green: #22C55E; --green2: #15A34A;
+      --purple: #7C3AED; --purple2: #A855F7; --pink: #EC4899;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
+    html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--dark);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden; line-height: 1.4; -webkit-font-smoothing: antialiased;
     }
-
-    /* FONDO ANIMADO */
     body::before {
-      content: '';
-      position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,0.15) 0%, transparent 50%),
-                  radial-gradient(ellipse at 80% 80%, rgba(236,72,153,0.1) 0%, transparent 50%),
-                  radial-gradient(ellipse at 50% 50%, rgba(255,215,0,0.05) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 80% 40% at 50% -5%, rgba(124,58,237,.35), transparent 70%),
+                  radial-gradient(ellipse 60% 30% at 90% 60%, rgba(236,72,153,.08), transparent 70%);
     }
-
-    .container { position: relative; z-index: 1; padding: 0 16px 32px; max-width: 480px; margin: 0 auto; }
-
-    /* HEADER */
-    .header {
-      text-align: center;
-      padding: 28px 0 20px;
-    }
-
-    .logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-
-    .logo-star {
-      font-size: 36px;
-      filter: drop-shadow(0 0 12px rgba(255,215,0,0.8));
-      animation: pulse-star 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-star {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(255,215,0,0.8)); }
-      50% { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(255,215,0,1)); }
-    }
-
-    .logo-text {
-      font-size: 28px;
-      font-weight: 900;
-      background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B6B);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-    }
-
-    .header-sub {
-      font-size: 13px;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
-
-    /* SORTEO CARD PRINCIPAL */
-    .sorteo-main {
-      background: linear-gradient(135deg, var(--dark2), var(--dark3));
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sorteo-main::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--purple), var(--gold), var(--pink));
-    }
-
-    .sorteo-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(124,58,237,0.2);
-      border: 1px solid rgba(124,58,237,0.4);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--purple2);
-      margin-bottom: 16px;
-      letter-spacing: 0.5px;
-    }
-
-    .dot-live {
-      width: 6px; height: 6px;
-      background: #22c55e;
-      border-radius: 50%;
-      animation: blink 1.2s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-
-    .sorteo-titulo {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 20px;
-      line-height: 1.3;
-    }
-
-    /* PREMIOS */
-    .premios-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .premio-card {
-      background: rgba(0,0,0,0.3);
-      border-radius: 14px;
-      padding: 12px 8px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.06);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .premio-card.gold { border-color: rgba(255,215,0,0.3); }
-    .premio-card.silver { border-color: rgba(192,192,192,0.2); }
-    .premio-card.bronze { border-color: rgba(205,127,50,0.2); }
-
-    .premio-emoji { font-size: 22px; margin-bottom: 4px; }
-    .premio-monto { font-size: 15px; font-weight: 800; }
-    .premio-monto.gold { color: var(--gold); }
-    .premio-monto.silver { color: #C0C0C0; }
-    .premio-monto.bronze { color: #CD7F32; }
-    .premio-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .premio-stars { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .sorteo-fecha { text-align: center; font-size: 12px; color: var(--gold); margin: -10px 0 16px; font-weight: 600; }
-
-    /* PROGRESO */
-    .progress-section { margin-bottom: 20px; }
-
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .progress-label { font-size: 13px; color: var(--muted); }
-    .progress-pct { font-size: 13px; font-weight: 700; color: var(--gold); }
-
-    .progress-bar {
-      background: rgba(255,255,255,0.07);
-      border-radius: 999px;
-      height: 10px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .progress-fill {
-      background: linear-gradient(90deg, var(--purple), var(--gold2), var(--gold));
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
-
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .progress-counts {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* STATS ROW */
-    .stats-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .stat-box {
-      background: rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 12px 8px;
-      text-align: center;
-    }
-
-    .stat-val {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff, #C4B5FD);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
-
-    /* COMPRA */
-    .compra-section {
-      background: rgba(0,0,0,0.2);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .compra-label { font-size: 12px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
-
-    .qty-controls {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .qty-btn {
-      width: 52px;
-      height: 52px;
-      background: rgba(124,58,237,0.15);
-      border: none;
-      color: var(--purple2);
-      font-size: 22px;
-      cursor: pointer;
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .qty-btn:active { background: rgba(124,58,237,0.35); }
-
-    .qty-num {
-      flex: 1;
-      text-align: center;
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .precio-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .precio-txt { font-size: 13px; color: var(--muted); }
-
-    .precio-val {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* BOTÓN COMPRAR */
-    .btn-comprar {
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, var(--purple), var(--purple2), var(--pink));
-      border: none;
-      border-radius: 16px;
-      color: #fff;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(124,58,237,0.4);
-      margin-bottom: 12px;
-    }
-
-    .btn-comprar::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn-comprar:active { transform: scale(0.98); box-shadow: 0 4px 16px rgba(124,58,237,0.3); }
-    .btn-comprar:hover::before { left: 100%; }
-    .btn-comprar:disabled { background: #2a2a4a; color: #555; cursor: not-allowed; box-shadow: none; }
-
-    /* BOTÓN GRATIS */
-    .btn-gratis {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1));
-      border: 1px solid rgba(255,215,0,0.3);
-      border-radius: 14px;
-      color: var(--gold);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-gratis:active { background: rgba(255,215,0,0.2); }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-
-    .tab-btn.active {
-      background: rgba(124,58,237,0.2);
-      border-color: var(--purple);
-      color: var(--purple2);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* MIS BOLETOS */
-    .boletos-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px;
-    }
-
-    .boletos-card h3 {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .boleto-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .boleto-item:last-child { border-bottom: none; }
-
-    .boleto-num {
-      font-size: 15px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .boleto-tag {
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 600;
-    }
-
-    .boleto-tag.gratis { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-    .boleto-tag.comprado { background: rgba(124,58,237,0.15); color: var(--purple2); border: 1px solid rgba(124,58,237,0.3); }
-
-    .empty-state {
-      text-align: center;
-      padding: 30px 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; }
-
-    /* REFERIDOS */
-    .referidos-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px;
-    }
-
-    .ref-link-box {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .ref-link-txt {
-      flex: 1;
-      font-size: 11px;
-      color: var(--muted);
-      word-break: break-all;
-      line-height: 1.4;
-    }
-
-    .btn-copiar {
-      padding: 8px 14px;
-      background: rgba(124,58,237,0.2);
-      border: 1px solid var(--purple);
-      border-radius: 8px;
-      color: var(--purple2);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s;
-    }
-
-    .btn-copiar:active { background: rgba(124,58,237,0.4); }
-
-    .ref-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .ref-stat {
-      background: rgba(0,0,0,0.2);
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-    }
-
-    .ref-stat-val { font-size: 24px; font-weight: 800; color: var(--gold); }
-    .ref-stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
-
-    .ref-bonus-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .ref-bonus {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      font-size: 13px;
-    }
-
-    .ref-bonus-icon { font-size: 18px; }
-    .ref-bonus-txt { flex: 1; color: var(--muted); }
-    .ref-bonus-reward { font-weight: 700; color: var(--gold); font-size: 12px; }
-
-    /* AD REWARD */
-    .ad-section {
-      background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02));
-      border: 1px solid rgba(34,197,94,0.25);
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .ad-section h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #22c55e;
-      margin-bottom: 6px;
-    }
-
-    .ad-section .ad-desc {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    .ad-counter {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .ad-counter strong {
-      color: #22c55e;
-      font-size: 18px;
-    }
-
-    .btn-ad {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #16a34a, #22c55e);
-      border: none;
-      border-radius: 14px;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 6px 24px rgba(34,197,94,0.3);
-    }
-
-    .btn-ad:active { transform: scale(0.98); }
-    .btn-ad:disabled { background: #2a2a4a; color: #555; cursor: not-allowed; box-shadow: none; }
-
-    .ad-progress-bar {
-      background: rgba(255,255,255,0.07);
-      border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-      margin-top: 12px;
-    }
-
-    .ad-progress-fill {
-      background: linear-gradient(90deg, #16a34a, #22c55e);
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--dark3);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 999;
-      white-space: nowrap;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { border-color: #22c55e; color: #22c55e; }
-    .toast.error { border-color: #ef4444; color: #ef4444; }
-    .toast.info { border-color: var(--gold); color: var(--gold); }
-
-    /* LOADING */
-    .loading {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
-
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid rgba(124,58,237,0.2);
-      border-top-color: var(--purple2);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
+    button { font-family: inherit; cursor: pointer; border: 0; color: inherit; }
+    .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 14px 16px calc(36px + env(safe-area-inset-bottom)); }
+
+    /* ── Barra superior ── */
+    .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; letter-spacing: -.3px; }
+    .brand .logo { font-size: 22px; filter: drop-shadow(0 0 10px rgba(255,213,74,.55)); }
+    .pill-tk { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,.07); border: 1px solid var(--line); border-radius: 99px; padding: 7px 13px 7px 11px; font-size: 14px; }
+    .pill-tk b { font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; }
+    .pill-tk.pop { animation: pop .5s; }
+    @keyframes pop { 40% { transform: scale(1.18); background: rgba(34,197,94,.25); } }
+
+    /* ── Hero: premio mayor ── */
+    .hero { position: relative; text-align: center; border-radius: 28px; padding: 22px 18px 18px; overflow: hidden;
+      background: linear-gradient(165deg, rgba(124,58,237,.30), rgba(19,19,43,.95) 55%); border: 1px solid rgba(255,213,74,.22); }
+    .hero::before { content: ''; position: absolute; left: 50%; top: -60px; width: 300px; height: 300px; transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255,213,74,.20), transparent 65%); pointer-events: none; }
+    .live { display: inline-flex; align-items: center; gap: 7px; background: rgba(34,197,94,.12); color: #7BE7A3; border: 1px solid rgba(34,197,94,.3);
+      border-radius: 99px; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 5px 12px; position: relative; }
+    .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.6s infinite; }
+    @keyframes blink { 50% { opacity: .3; } }
+    .hero-label { position: relative; margin-top: 14px; font-size: 12px; font-weight: 800; letter-spacing: 2.5px; color: var(--muted); }
+    .hero-amount { position: relative; font-size: 76px; line-height: 1; font-weight: 900; letter-spacing: -3px; margin: 2px 0 0;
+      background: linear-gradient(180deg, #FFF6C4, var(--gold) 50%, var(--gold2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 24px rgba(255,167,38,.35)); }
+    .hero-amount small { font-size: 26px; letter-spacing: 0; margin-left: 4px; }
+    .hero-sub { position: relative; font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .prizes { position: relative; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .prize { background: rgba(0,0,0,.28); border: 1px solid var(--line); border-radius: 99px; padding: 7px 13px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+    .prize span { color: var(--gold); }
+    .when { position: relative; margin-top: 14px; font-size: 13px; color: var(--gold); font-weight: 600; }
+    .sorteo-name { position: relative; margin-top: 10px; font-size: 12px; color: var(--faint); }
+
+    /* ── Botón principal: ver anuncio ── */
+    .cta { margin: 14px 0 0; }
+    .btn-watch { position: relative; width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; color: #fff;
+      background: linear-gradient(135deg, #2BD866, var(--green2)); border-radius: 24px; padding: 14px 16px 14px 14px;
+      box-shadow: 0 12px 34px rgba(34,197,94,.38), inset 0 1px 0 rgba(255,255,255,.3); transition: transform .12s, filter .2s; }
+    .btn-watch.ready { animation: glow 2.4s infinite; }
+    @keyframes glow { 0%,100% { box-shadow: 0 12px 34px rgba(34,197,94,.38), 0 0 0 0 rgba(34,197,94,.5), inset 0 1px 0 rgba(255,255,255,.3); }
+      60% { box-shadow: 0 12px 34px rgba(34,197,94,.38), 0 0 0 12px rgba(34,197,94,0), inset 0 1px 0 rgba(255,255,255,.3); } }
+    .btn-watch:active { transform: scale(.975); }
+    .btn-watch:disabled { background: linear-gradient(135deg, #243044, #1C2535); box-shadow: none; animation: none; color: #9AA6BC; cursor: default; }
+    .bw-ico { flex: none; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.22); display: grid; place-items: center; font-size: 22px; }
+    .btn-watch:disabled .bw-ico { background: rgba(255,255,255,.07); }
+    .bw-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .bw-txt b { font-size: 20px; font-weight: 800; letter-spacing: -.3px; }
+    .bw-txt small { font-size: 13px; opacity: .88; margin-top: 1px; }
+    .bw-badge { flex: none; background: rgba(0,0,0,.25); border-radius: 99px; padding: 8px 12px; font-weight: 800; font-size: 15px; }
+    .btn-watch:disabled .bw-badge { display: none; }
+    .spin { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: rot .7s linear infinite; }
+    @keyframes rot { to { transform: rotate(360deg); } }
+    .dots { display: flex; justify-content: center; gap: 7px; margin: 14px 0 6px; }
+    .dots i { width: 26px; height: 8px; border-radius: 99px; background: rgba(255,255,255,.12); transition: .3s; }
+    .dots i.on { background: linear-gradient(90deg, var(--green), #6EE7A0); box-shadow: 0 0 10px rgba(34,197,94,.5); }
+    .meter { height: 8px; border-radius: 99px; background: rgba(255,255,255,.1); margin: 14px 0 6px; overflow: hidden; }
+    .meter i { display: block; height: 100%; background: linear-gradient(90deg, var(--green), #6EE7A0); border-radius: 99px; transition: width .4s; }
+    .cta-note { text-align: center; font-size: 13px; color: var(--muted); }
+    .cta-note b { color: var(--text); }
+
+    /* ── Tarjetas ── */
+    .card { background: linear-gradient(170deg, rgba(26,26,58,.8), rgba(19,19,43,.95)); border: 1px solid var(--line); border-radius: 22px; padding: 18px; margin-top: 14px; }
+    .card h2 { font-size: 15px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .rowb { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .rowb .big { font-size: 26px; font-weight: 800; letter-spacing: -.8px; font-variant-numeric: tabular-nums; }
+    .rowb .big small { font-size: 14px; color: var(--muted); font-weight: 600; letter-spacing: 0; }
+    .muted { color: var(--muted); } .sm { font-size: 13px; }
+    .bar { height: 12px; background: rgba(0,0,0,.4); border-radius: 99px; overflow: hidden; margin: 10px 0 8px; }
+    .bar i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--purple), var(--pink), var(--gold)); transition: width .8s; }
+    .hint { font-size: 12.5px; color: var(--faint); margin-top: 8px; }
+
+    /* ── Cómo funciona ── */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .step { text-align: center; }
+    .step .si { width: 54px; height: 54px; margin: 0 auto 8px; border-radius: 18px; display: grid; place-items: center; font-size: 26px; background: rgba(124,58,237,.18); border: 1px solid rgba(168,85,247,.3); position: relative; }
+    .step .si em { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--purple2); font-style: normal; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+    .step b { display: block; font-size: 13px; line-height: 1.25; }
+    .step span { font-size: 12px; color: var(--muted); }
+
+    /* ── Más boletos ── */
+    .earn { display: flex; align-items: center; gap: 13px; padding: 13px 0; border-top: 1px solid var(--line); }
+    .earn:first-of-type { border-top: 0; padding-top: 0; }
+    .earn .ei { flex: none; width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; font-size: 22px; background: rgba(255,255,255,.06); }
+    .earn .et { flex: 1; min-width: 0; } .earn .et b { display: block; font-size: 14.5px; } .earn .et span { font-size: 12.5px; color: var(--muted); }
+    .btn-s { flex: none; border-radius: 14px; padding: 11px 16px; font-weight: 800; font-size: 14px; color: #fff; background: linear-gradient(135deg, var(--purple), var(--purple2)); box-shadow: 0 6px 18px rgba(124,58,237,.35); }
+    .btn-s:active { transform: scale(.96); }
+    .btn-s:disabled, .btn-s.done { background: rgba(34,197,94,.14); color: #7BE7A3; box-shadow: none; cursor: default; }
+    .ref-prog { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+    .ref-prog .bar { height: 7px; margin: 6px 0 0; } .ref-prog .bar i { background: linear-gradient(90deg, var(--pink), var(--gold)); }
+    .link-copy { margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: rgba(0,0,0,.3); border: 1px dashed rgba(255,255,255,.18); border-radius: 12px; padding: 10px 12px; font-size: 12px; color: var(--muted); }
+    .link-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .link-copy b { color: var(--purple2); flex: none; }
+
+    /* ── Mis boletos ── */
+    .tks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .tk { background: rgba(255,213,74,.08); border: 1px solid rgba(255,213,74,.22); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+    .tk small { font-size: 11px; opacity: .8; margin-right: 3px; }
+    .tk.nuevo { animation: pop .8s; }
+    .link-btn { background: none; color: var(--purple2); font-weight: 700; font-size: 13px; margin-top: 12px; padding: 4px 0; }
+    .empty { text-align: center; padding: 8px 0 2px; color: var(--muted); font-size: 14px; }
+    .empty b.ic { display: block; font-size: 30px; margin-bottom: 4px; }
+
+    /* ── FAQ ── */
+    details { border-top: 1px solid var(--line); padding: 13px 0; } details:first-of-type { border-top: 0; padding-top: 0; }
+    summary { cursor: pointer; font-weight: 700; font-size: 14px; list-style: none; display: flex; justify-content: space-between; gap: 10px; }
+    summary::-webkit-details-marker { display: none; } summary::after { content: '+'; color: var(--purple2); font-size: 20px; line-height: 1; }
+    details[open] summary::after { content: '–'; }
+    details p { color: var(--muted); font-size: 13.5px; margin-top: 9px; }
+
+    /* ── Estados ── */
+    .skeleton { height: 360px; border-radius: 28px; background: linear-gradient(100deg, rgba(255,255,255,.04) 30%, rgba(255,255,255,.09) 50%, rgba(255,255,255,.04) 70%); background-size: 200% 100%; animation: sh 1.4s infinite; }
+    @keyframes sh { to { background-position: -200% 0; } }
+    .notg { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.35); color: #fcd34d; border-radius: 16px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 14px; }
+    .closed { text-align: center; padding: 34px 18px; } .closed .ic { font-size: 44px; display: block; margin-bottom: 8px; } .closed h3 { font-size: 20px; margin-bottom: 6px; } .closed p { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+    .foot { text-align: center; font-size: 12px; color: var(--faint); margin-top: 22px; }
+
+    /* ── Toast y celebración ── */
+    #toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 30px); opacity: 0; pointer-events: none; z-index: 60;
+      background: #232347; border: 1px solid rgba(255,255,255,.14); padding: 12px 18px; border-radius: 14px; font-weight: 600; font-size: 14px; max-width: 90vw; text-align: center; transition: .25s; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+    #toast.show { transform: translate(-50%, 0); opacity: 1; } #toast.err { border-color: rgba(239,68,68,.6); } #toast.ok { border-color: rgba(34,197,94,.6); }
+    .celebra { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: rgba(5,5,14,.75); backdrop-filter: blur(5px); animation: fade .2s; padding: 24px; }
+    @keyframes fade { from { opacity: 0; } }
+    .celebra .box { text-align: center; background: linear-gradient(170deg, #25254F, #15152F); border: 1px solid rgba(255,213,74,.4); border-radius: 28px; padding: 30px 34px; box-shadow: 0 0 80px rgba(255,213,74,.25); animation: boom .45s cubic-bezier(.2,1.4,.4,1); max-width: 340px; }
+    @keyframes boom { from { transform: scale(.5); opacity: 0; } }
+    .celebra .t1 { font-size: 15px; color: var(--muted); font-weight: 600; }
+    .celebra .num { font-size: 58px; font-weight: 900; letter-spacing: -2px; line-height: 1.1; margin: 4px 0; background: linear-gradient(180deg, #FFF6C4, var(--gold2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .celebra .t2 { font-size: 14px; color: var(--text); } .celebra .t3 { font-size: 12px; color: var(--faint); margin-top: 14px; }
+    .confeti { position: fixed; top: -30px; font-size: 22px; z-index: 81; pointer-events: none; animation: cae 2s ease-in forwards; }
+    @keyframes cae { to { transform: translateY(105vh) rotate(540deg); opacity: .7; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    @media (max-width: 350px) { .hero-amount { font-size: 62px; } .bw-txt b { font-size: 18px; } .steps { gap: 6px; } }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="app">
 
-  <div class="header">
-    <div class="logo-wrap">
-      <span class="logo-star">⭐</span>
-      <span class="logo-text">Lucky Stars</span>
-      <span class="logo-star">⭐</span>
-    </div>
-    <div class="header-sub">Sorteos gratis — gana dinero real 💰</div>
+  <header class="top">
+    <div class="brand"><span class="logo">⭐</span> Lucky Stars</div>
+    <button class="pill-tk" id="pill" onclick="irA('mis')" aria-label="Mis boletos">🎟 <b id="pill-n">0</b></button>
+  </header>
+
+  <div id="loading"><div class="skeleton"></div></div>
+  <div id="notg" class="notg" style="display:none">📲 Abre esta página desde el bot en Telegram para poder ganar boletos.</div>
+
+  <!-- Sorteo cerrado -->
+  <div id="cerrado" style="display:none" class="card closed">
+    <span class="ic">⏳</span><h3>No hay sorteo activo ahora</h3>
+    <p>Estamos preparando el siguiente. Entra a nuestro canal para enterarte primero.</p>
+    <button class="btn-s" onclick="abrirCanal()">⭐ Ir al canal</button>
   </div>
 
-  <div id="loading" class="loading">
-    <div class="spinner"></div>
-    <div>Cargando sorteo...</div>
-  </div>
+  <main id="contenido" style="display:none">
 
-  <div id="contenido" style="display:none">
+    <!-- PREMIO -->
+    <section class="hero">
+      <span class="live"><i></i> SORTEO EN VIVO</span>
+      <div class="hero-label">PREMIO MAYOR</div>
+      <div class="hero-amount" id="h-monto">$0<small>USD</small></div>
+      <div class="hero-sub">Dinero real · pago en cripto</div>
+      <div class="prizes" id="h-premios"></div>
+      <div class="when" id="h-cuando" style="display:none"></div>
+      <div class="sorteo-name" id="h-titulo"></div>
+    </section>
 
-    <!-- SORTEO PRINCIPAL -->
-    <div class="sorteo-main">
-      <div class="sorteo-badge"><span class="dot-live"></span> EN VIVO</div>
-      <div class="sorteo-titulo" id="sorteo-titulo">Cargando...</div>
-      <div class="sorteo-fecha" id="sorteo-fecha" style="display:none"></div>
-
-      <div class="premios-grid" id="premios-grid"></div>
-
-      <div class="progress-section">
-        <div class="progress-header">
-          <span class="progress-label">Boletos repartidos</span>
-          <span class="progress-pct" id="progress-pct">0%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-        </div>
-        <div class="progress-counts">
-          <span id="progress-vendidos">0 repartidos</span>
-          <span id="progress-restantes">100 restantes</span>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-val" id="stat-vendidos">0</div>
-          <div class="stat-label">Repartidos</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="stat-restantes">—</div>
-          <div class="stat-label">Restantes</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" style="color:#22c55e">GRATIS</div>
-          <div class="stat-label">Por boleto</div>
-        </div>
-      </div>
-
-      <button class="btn-gratis" onclick="reclamarGratis()">
-        🎁 Boleto gratis — únete al canal
+    <!-- BOTÓN PRINCIPAL -->
+    <section class="cta">
+      <button class="btn-watch ready" id="btn-ad" onclick="verAnuncio()">
+        <span class="bw-ico" id="bw-ico">▶</span>
+        <span class="bw-txt"><b id="bw-t">Ver anuncio</b><small id="bw-s">Gana 1 boleto gratis</small></span>
+        <span class="bw-badge">+1 🎟</span>
       </button>
-    </div>
+      <div id="ad-prog"></div>
+      <div class="cta-note" id="cta-note"></div>
+    </section>
 
-    <!-- AD REWARD SECTION -->
-    <div class="ad-section" id="ad-section" style="display:none">
-      <h3>📺 GANA BOLETOS GRATIS</h3>
-      <p class="ad-desc">Mira un anuncio corto y recibe <strong>1 boleto gratis</strong> al instante</p>
-      <div class="ad-progress-bar">
-        <div class="ad-progress-fill" id="ad-progress-fill" style="width:0%"></div>
+    <!-- PARTICIPACIÓN -->
+    <section class="card" id="mis">
+      <h2>🎟 Tu participación</h2>
+      <div id="mis-body"></div>
+    </section>
+
+    <!-- MÁS BOLETOS -->
+    <section class="card" id="mas-boletos">
+      <h2>⚡ Consigue más boletos</h2>
+      <div class="earn">
+        <div class="ei">📣</div>
+        <div class="et"><b>Únete a nuestro canal</b><span>+1 boleto, una sola vez</span></div>
+        <button class="btn-s" id="btn-canal" onclick="reclamarGratis()">Reclamar</button>
       </div>
-      <p class="ad-counter" id="ad-counter">0 / 5 anuncios hoy</p>
-      <button class="btn-ad" id="btn-ad" onclick="verAnuncio()">
-        📺 Ver anuncio = 1 boleto 🎟
-      </button>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('boletos', this)">🎟 Mis Boletos</button>
-      <button class="tab-btn" onclick="showTab('referidos', this)">👥 Referidos</button>
-    </div>
-
-    <!-- MIS BOLETOS -->
-    <div id="tab-boletos" class="tab-content active">
-      <div class="boletos-card">
-        <h3>🎟 MIS BOLETOS</h3>
-        <div id="lista-boletos">
-          <div class="empty-state">
-            <div class="empty-icon">🎟</div>
-            No tienes boletos aún
-          </div>
+      <div class="earn" style="flex-wrap:wrap">
+        <div class="ei">👥</div>
+        <div class="et"><b>Invita a tus amigos</b><span>+1 boleto por cada amigo que vea su 1er anuncio</span></div>
+        <button class="btn-s" onclick="compartir()">Invitar</button>
+        <div style="width:100%">
+          <div class="ref-prog" id="ref-prog"></div>
+          <button class="link-copy" onclick="copiarLink()"><span id="ref-link">Cargando tu link…</span><b>Copiar</b></button>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- REFERIDOS -->
-    <div id="tab-referidos" class="tab-content">
-      <div class="referidos-card">
-        <h3 style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:14px">👥 SISTEMA DE REFERIDOS</h3>
+    <!-- PROGRESO DEL SORTEO -->
+    <section class="card">
+      <h2>📊 Progreso del sorteo</h2>
+      <div class="rowb"><div class="big" id="p-n">0<small> / 0 boletos</small></div><b id="p-pct" style="color:var(--gold)">0%</b></div>
+      <div class="bar"><i id="p-bar"></i></div>
+      <div class="rowb sm muted"><span id="p-part">👥 0 participantes</span><span id="p-rest"></span></div>
+      <div class="hint">El sorteo se realiza solo al llegar a la meta. Más boletos = más probabilidad de ganar.</div>
+    </section>
 
-        <div class="ref-link-box">
-          <div class="ref-link-txt" id="ref-link">Cargando tu link...</div>
-          <button class="btn-copiar" onclick="copiarLink()">Copiar</button>
-        </div>
-
-        <div class="ref-stats">
-          <div class="ref-stat">
-            <div class="ref-stat-val" id="ref-count">0</div>
-            <div class="ref-stat-label">Amigos que vieron su 1er anuncio</div>
-          </div>
-          <div class="ref-stat">
-            <div class="ref-stat-val" id="ref-boletos">0</div>
-            <div class="ref-stat-label">Boletos ganados</div>
-          </div>
-        </div>
-
-        <div class="ref-bonus-list">
-          <div class="ref-bonus">
-            <span class="ref-bonus-icon">🎁</span>
-            <span class="ref-bonus-txt">Por cada amigo que vea su 1er anuncio</span>
-            <span class="ref-bonus-reward">+1 boleto</span>
-          </div>
-          <div class="ref-bonus">
-            <span class="ref-bonus-icon">🏆</span>
-            <span class="ref-bonus-txt">Al llegar a 5 referidos</span>
-            <span class="ref-bonus-reward">+2 boletos</span>
-          </div>
-          <div class="ref-bonus">
-            <span class="ref-bonus-icon">🌟</span>
-            <span class="ref-bonus-txt">Al llegar a 10 referidos</span>
-            <span class="ref-bonus-reward">+5 boletos</span>
-          </div>
-        </div>
+    <!-- CÓMO FUNCIONA -->
+    <section class="card">
+      <h2>✨ Así de fácil</h2>
+      <div class="steps">
+        <div class="step"><div class="si">📺<em>1</em></div><b>Mira un anuncio</b><span>Dura unos segundos</span></div>
+        <div class="step"><div class="si">🎟<em>2</em></div><b>Recibe tu boleto</b><span>Al instante, gratis</span></div>
+        <div class="step"><div class="si">💵<em>3</em></div><b>Gana dinero</b><span>Sorteo al azar</span></div>
       </div>
-    </div>
+    </section>
 
-  </div>
+    <!-- PREGUNTAS -->
+    <section class="card">
+      <h2>💬 Preguntas rápidas</h2>
+      <details><summary>¿De verdad es gratis?</summary><p>Sí. Nunca pagas nada: los anuncios que ves financian los premios.</p></details>
+      <details><summary>¿Cómo cobro si gano?</summary><p>Te avisamos por Telegram. Responde al bot con <b>/wallet</b> y tu dirección de cripto, y te enviamos el premio.</p></details>
+      <details><summary>¿Cuántos anuncios puedo ver?</summary><p id="faq-lim">Hasta 5 al día. Cada uno te da 1 boleto.</p></details>
+      <details><summary>¿Cómo se elige al ganador?</summary><p>Al azar entre todos los boletos. Quien tiene más boletos tiene más probabilidad, pero cualquiera puede ganar.</p></details>
+    </section>
+
+    <div class="foot">⭐ Lucky Stars · Sorteos gratis en Telegram</div>
+  </main>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
   const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0D0D1A'); tg.setBackgroundColor('#0D0D1A'); }
+  if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#0A0A16'); tg.setBackgroundColor('#0A0A16'); } catch (e) {} }
 
   const BACKEND = 'https://luckystars-backend.onrender.com';
-  let sorteoData = null;
-  let userId = null;
-  let linkReferido = '';
-  let adStatus = { adsHoy: 0, limite: 5, restantes: 5 };
+  const CANAL_URL = 'https://t.me/LuckyStarsOficial';
+  const userId = tg?.initDataUnsafe?.user ? String(tg.initDataUnsafe.user.id) : null;
 
-  // Obtener userId de Telegram
-  if (tg?.initDataUnsafe?.user) {
-    userId = String(tg.initDataUnsafe.user.id);
+  let sorteo = null, usuario = null, boletos = [], ad = { adsHoy: 0, limite: 5, restantes: 5, cooldownSeg: 15, espera: 0 };
+  let cargandoAd = false, timerEspera = null, verTodos = false, ultimoNumero = null;
+
+  const $ = id => document.getElementById(id);
+  const num = n => Number(n || 0).toLocaleString('es-MX');
+  const usd = n => '$' + (Number.isInteger(+n) ? num(n) : (+n).toFixed(2));
+  const ICONO = { ad: '📺', canal: '📣', referido: '👥', bonus: '🌟', regalo: '🎁', compra: '⭐' };
+
+  function toast(msg, tipo) {
+    const t = $('toast'); t.textContent = msg; t.className = 'show ' + (tipo || '');
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.className = '', 3200);
   }
+  function haptic(tipo) { try { tg?.HapticFeedback?.notificationOccurred(tipo); } catch (e) {} }
+  function irA(id) { $(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  function abrirCanal() { tg?.openTelegramLink ? tg.openTelegramLink(CANAL_URL) : window.open(CANAL_URL, '_blank'); }
 
-  async function cargarTodo() {
+  async function get(path) { const r = await fetch(BACKEND + path); return r.json(); }
+
+  /* ───────── Carga de datos ───────── */
+  async function cargar() {
     try {
-      const [sorteoRes, usuarioRes] = await Promise.all([
-        fetch(BACKEND + '/api/sorteo'),
-        userId ? fetch(BACKEND + '/api/usuario/' + userId) : Promise.resolve(null)
+      const [s, u, b, a] = await Promise.all([
+        get('/api/sorteo'),
+        userId ? get('/api/usuario/' + userId) : null,
+        userId ? get('/api/mis-boletos/' + userId) : [],
+        userId ? get('/api/ad-status/' + userId) : null
       ]);
-
-      sorteoData = await sorteoRes.json();
-
-      if (sorteoData.error) {
-        document.getElementById('loading').innerHTML = '<div style="color:#ef4444;text-align:center;padding:40px">No hay sorteo activo en este momento</div>';
-        return;
-      }
-
-      if (usuarioRes) {
-        const usuario = await usuarioRes.json();
-        linkReferido = usuario.linkReferido || '';
-        document.getElementById('ref-link').textContent = linkReferido;
-        document.getElementById('ref-count').textContent = usuario.referidosQueCompraron || 0;
-        document.getElementById('ref-boletos').textContent = usuario.referidosQueCompraron || 0;
-      }
-
-      renderSorteo();
-      if (userId) {
-        cargarMisBoletosUI();
-        await cargarAdStatus();
-      }
-
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('contenido').style.display = 'block';
-
+      $('loading').style.display = 'none';
+      if (s.error) { $('contenido').style.display = 'none'; $('cerrado').style.display = 'block'; return; }
+      $('cerrado').style.display = 'none'; $('contenido').style.display = 'block';
+      sorteo = s; usuario = u; boletos = Array.isArray(b) ? b : [];
+      if (a && !a.error) { ad = { ...ad, ...a }; arrancarEspera(a.espera || 0); }
+      $('notg').style.display = userId ? 'none' : 'block';
+      render();
     } catch (e) {
-      document.getElementById('loading').innerHTML = '<div style="color:#ef4444;text-align:center;padding:40px">Error de conexión. Intenta de nuevo.</div>';
+      $('loading').innerHTML = '<div class="card closed"><span class="ic">📡</span><h3>Sin conexión</h3><p>No pudimos cargar el sorteo. Revisa tu internet e inténtalo de nuevo.</p><button class="btn-s" onclick="location.reload()">Reintentar</button></div>';
     }
   }
 
-  function renderSorteo() {
-    document.getElementById('sorteo-titulo').textContent = sorteoData.titulo;
-    document.getElementById('stat-vendidos').textContent = sorteoData.vendidos;
-    document.getElementById('stat-restantes').textContent = sorteoData.restantes;
-    // Precio ya no aplica — boletos son gratis
-    document.getElementById('progress-pct').textContent = sorteoData.porcentaje + '%';
-    document.getElementById('progress-fill').style.width = sorteoData.porcentaje + '%';
-    document.getElementById('progress-vendidos').textContent = sorteoData.vendidos + ' repartidos';
-    document.getElementById('progress-restantes').textContent = sorteoData.restantes + ' restantes';
-
-    // Premios
-    const emojis = ['🥇', '🥈', '🥉'];
-    const clases = ['gold', 'silver', 'bronze'];
-    const fmtUsd = n => Number.isInteger(n) ? String(n) : n.toFixed(2);
-    const fechaEl = document.getElementById('sorteo-fecha');
-    if (sorteoData.fechaSorteo) {
-      fechaEl.style.display = 'block';
-      fechaEl.textContent = '⏰ Sorteo: ' + new Date(sorteoData.fechaSorteo).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' });
-    } else {
-      fechaEl.style.display = 'none';
-    }
-    const grid = document.getElementById('premios-grid');
-    grid.innerHTML = sorteoData.premios.map((p, i) => `
-      <div class="premio-card ${clases[i] || 'bronze'}">
-        <div class="premio-emoji">${emojis[i] || '🏅'}</div>
-        <div class="premio-monto ${clases[i] || 'bronze'}">$${fmtUsd(p.montoUsd)} USD</div>
-        <div class="premio-desc">${p.descripcion}</div>
-      </div>
-    `).join('');
-
-    if (!sorteoData.activo) {
-      const btnAd = document.getElementById('btn-ad');
-      if (btnAd) { btnAd.disabled = true; btnAd.textContent = '✅ Sorteo completado'; }
-    }
+  /* ───────── Pintado ───────── */
+  function render() {
+    renderHero(); renderCTA(); renderMis(); renderMas(); renderProgreso();
+    $('faq-lim').textContent = `Hasta ${ad.limite} al día. Cada uno te da 1 boleto.`;
+    $('pill-n').textContent = num(boletos.length);
   }
 
-  const ETIQUETA_ORIGEN = { ad: '📺 Anuncio', canal: '📣 Canal', referido: '👥 Referido', bonus: '🌟 Bonus', regalo: '🎁 Regalo', compra: 'Comprado' };
-
-  async function cargarMisBoletosUI() {
-    try {
-      const res = await fetch(BACKEND + '/api/mis-boletos/' + userId);
-      const boletos = await res.json();
-      const lista = document.getElementById('lista-boletos');
-      if (boletos.length === 0) {
-        lista.innerHTML = '<div class="empty-state"><div class="empty-icon">🎟</div>No tienes boletos aún</div>';
-        return;
-      }
-      lista.innerHTML = boletos.map(b => `
-        <div class="boleto-item">
-          <span class="boleto-num">#${b.numero}</span>
-          <span class="boleto-tag ${b.origen === 'compra' ? 'comprado' : 'gratis'}">${ETIQUETA_ORIGEN[b.origen] || 'Gratis'}</span>
-        </div>
-      `).join('');
-    } catch (e) {}
+  function renderHero() {
+    const p = sorteo.premios || [];
+    const top = p[0] || { montoUsd: 0 };
+    $('h-monto').innerHTML = usd(top.montoUsd) + '<small>USD</small>';
+    const medallas = ['🥇', '🥈', '🥉'];
+    const resto = p.slice(1);
+    $('h-premios').innerHTML = resto.slice(0, 3).map((x, i) => `<div class="prize">${medallas[i + 1] || '🏅'} <span>${usd(x.montoUsd)}</span></div>`).join('')
+      + (resto.length > 3 ? `<div class="prize">+${resto.length - 3} más</div>` : '');
+    $('h-titulo').textContent = sorteo.titulo;
+    const c = $('h-cuando');
+    if (sorteo.fechaSorteo) { c.style.display = 'block'; c.textContent = '⏰ Sorteo ' + cuentaAtras(sorteo.fechaSorteo); } else c.style.display = 'none';
+  }
+  function cuentaAtras(iso) {
+    const ms = new Date(iso) - new Date(); if (ms <= 0) return 'en unos minutos';
+    const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+    return d ? `en ${d} ${d === 1 ? 'día' : 'días'} ${h} h` : h ? `en ${h} h ${m % 60} min` : `en ${m} min`;
   }
 
-  async function reclamarGratis() {
-    if (!tg || !tg.initDataUnsafe?.user) {
-      mostrarToast('Abre desde Telegram', 'error');
+  function renderCTA() {
+    const btn = $('btn-ad'), t = $('bw-t'), s = $('bw-s'), ico = $('bw-ico'), nota = $('cta-note');
+    const lleno = sorteo.restantes <= 0;
+    btn.classList.remove('ready');
+    if (!userId) { btn.disabled = true; t.textContent = 'Abre desde Telegram'; s.textContent = 'Entra desde el bot para jugar'; ico.textContent = '📲'; nota.textContent = ''; $('ad-prog').innerHTML = ''; return; }
+    if (ad.limite <= 12) $('ad-prog').innerHTML = '<div class="dots">' + Array.from({ length: ad.limite }, (_, i) => `<i class="${i < ad.adsHoy ? 'on' : ''}"></i>`).join('') + '</div>';
+    else $('ad-prog').innerHTML = `<div class="meter"><i style="width:${Math.min(100, ad.adsHoy / ad.limite * 100)}%"></i></div>`;
+
+    if (cargandoAd) { btn.disabled = true; ico.innerHTML = '<span class="spin"></span>'; t.textContent = 'Cargando anuncio…'; s.textContent = 'Míralo hasta el final'; return; }
+    ico.textContent = '▶';
+    if (lleno) { btn.disabled = true; t.textContent = 'Sorteo lleno'; s.textContent = 'Pronto se elegirán los ganadores'; nota.innerHTML = ''; return; }
+    if (ad.restantes <= 0) {
+      btn.disabled = true; ico.textContent = '✅'; t.textContent = '¡Listo por hoy!'; s.textContent = 'Vuelve mañana por más boletos';
+      nota.innerHTML = 'Hoy viste <b>' + ad.limite + '</b> anuncios. <a href="#" style="color:var(--purple2);font-weight:700;text-decoration:none" onclick="irA(\'mas-boletos\');return false">Gana más boletos abajo ↓</a>';
       return;
     }
-    mostrarToast('Verificando membresía...', 'info');
-    try {
-      const res = await fetch(BACKEND + '/api/reclamar-gratis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initData: tg.initData })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        mostrarToast('🎁 ¡Boleto gratis obtenido!', 'success');
-        await cargarTodo();
-      } else {
-        mostrarToast(data.error || 'No disponible', 'error');
-      }
-    } catch (e) {
-      mostrarToast('Error de conexión', 'error');
+    if (ad.espera > 0) {
+      btn.disabled = true; ico.textContent = '⏱'; t.textContent = `Siguiente en ${ad.espera} s`; s.textContent = 'Un respiro y seguimos';
+      nota.innerHTML = `Hoy: <b>${ad.adsHoy}</b> de ${ad.limite} · te quedan <b>${ad.restantes}</b>`; return;
     }
+    btn.disabled = false; btn.classList.add('ready');
+    t.textContent = ad.adsHoy ? 'Ver otro anuncio' : 'Ver anuncio'; s.textContent = 'Gana 1 boleto gratis';
+    nota.innerHTML = ad.adsHoy ? `Hoy: <b>${ad.adsHoy}</b> de ${ad.limite} · te quedan <b>${ad.restantes}</b>` : `Puedes ver hasta <b>${ad.limite}</b> anuncios al día`;
   }
 
-  async function cargarAdStatus() {
-    try {
-      const res = await fetch(BACKEND + '/api/ad-status/' + userId);
-      adStatus = await res.json();
-      actualizarAdUI();
-    } catch (e) {
-      console.error('Error cargando ad status', e);
-    }
+  function renderMis() {
+    const n = boletos.length, total = sorteo.vendidos || 0;
+    if (!userId) { $('mis-body').innerHTML = '<div class="empty"><b class="ic">🔒</b>Abre la app desde Telegram para ver tus boletos.</div>'; return; }
+    if (!n) { $('mis-body').innerHTML = '<div class="empty"><b class="ic">🎟</b>Aún no tienes boletos.<br>Toca <b style="color:var(--green)">Ver anuncio</b> y consigue el primero.</div>'; return; }
+    const prob = total ? (n / total * 100) : 0;
+    const orden = boletos.slice().reverse();
+    const lista = (verTodos ? orden : orden.slice(0, 12)).map(b => `<span class="tk ${b.numero === ultimoNumero ? 'nuevo' : ''}"><small>${ICONO[b.origen] || '🎟'}</small>#${b.numero}</span>`).join('');
+    $('mis-body').innerHTML = `
+      <div class="rowb"><div class="big">${num(n)}<small> ${n === 1 ? 'boleto' : 'boletos'}</small></div><div style="text-align:right"><b style="color:var(--gold);font-size:20px">${prob < 10 ? prob.toFixed(1) : Math.round(prob)}%</b><div class="muted" style="font-size:12px">de los boletos</div></div></div>
+      <div class="tks">${lista}</div>
+      ${n > 12 ? `<button class="link-btn" onclick="verTodos=!verTodos;renderMis()">${verTodos ? 'Ver menos' : 'Ver todos (' + n + ')'}</button>` : ''}`;
   }
 
-  function actualizarAdUI() {
-    const section = document.getElementById('ad-section');
-    section.style.display = 'block';
-    const pct = (adStatus.adsHoy / adStatus.limite) * 100;
-    document.getElementById('ad-progress-fill').style.width = pct + '%';
-    document.getElementById('ad-counter').textContent = adStatus.adsHoy + ' / ' + adStatus.limite + ' anuncios hoy';
-    const btn = document.getElementById('btn-ad');
-    if (adStatus.restantes <= 0) {
-      btn.disabled = true;
-      btn.textContent = '✅ Límite diario alcanzado — vuelve mañana';
-    } else {
-      btn.disabled = false;
-      btn.textContent = '📺 Ver anuncio = 1 boleto 🎟';
-    }
+  function renderMas() {
+    const cb = $('btn-canal');
+    if (usuario?.canalReclamado) { cb.textContent = '✓ Listo'; cb.classList.add('done'); cb.disabled = true; } else { cb.textContent = 'Reclamar'; cb.classList.remove('done'); cb.disabled = !userId; }
+    const n = usuario?.referidosQueCompraron || 0;
+    const meta = n < 5 ? 5 : n < 10 ? 10 : null;
+    const premio = meta === 5 ? '+2 boletos extra' : '+5 boletos extra';
+    $('ref-prog').innerHTML = meta
+      ? `Invitaste a <b style="color:var(--text)">${n}</b> · faltan <b style="color:var(--text)">${meta - n}</b> para ${premio}<div class="bar"><i style="width:${(n / meta) * 100}%"></i></div>`
+      : `🏆 ¡Invitaste a <b style="color:var(--text)">${n}</b> amigos! Ya tienes todos los bonus.`;
+    $('ref-link').textContent = usuario?.linkReferido || 'Abre desde Telegram para ver tu link';
+  }
+
+  function renderProgreso() {
+    $('p-n').innerHTML = `${num(sorteo.vendidos)}<small> / ${num(sorteo.metaBoletos)} boletos</small>`;
+    $('p-pct').textContent = sorteo.porcentaje + '%';
+    requestAnimationFrame(() => $('p-bar').style.width = Math.min(100, sorteo.porcentaje) + '%');
+    $('p-part').textContent = `👥 ${num(sorteo.participantes)} participantes`;
+    $('p-rest').textContent = sorteo.restantes > 0 ? `Faltan ${num(sorteo.restantes)}` : '¡Meta alcanzada!';
+  }
+
+  /* ───────── Anuncios ───────── */
+  function arrancarEspera(seg) {
+    clearInterval(timerEspera); ad.espera = seg;
+    if (seg > 0) timerEspera = setInterval(() => { ad.espera = Math.max(0, ad.espera - 1); if (!ad.espera) clearInterval(timerEspera); if (sorteo) renderCTA(); }, 1000);
   }
 
   async function verAnuncio() {
-    if (!userId) {
-      mostrarToast('Abre desde Telegram', 'error');
-      return;
-    }
-    if (adStatus.restantes <= 0) {
-      mostrarToast('Ya alcanzaste el límite de hoy', 'error');
-      return;
-    }
-    const btn = document.getElementById('btn-ad');
-    btn.disabled = true;
-    btn.textContent = '⏳ Cargando anuncio...';
+    if (!userId || cargandoAd || ad.restantes <= 0 || ad.espera > 0) return;
+    cargandoAd = true; renderCTA();
     try {
-      try {
-        await show_11964434();
-      } catch (adErr) {
-        mostrarToast('Mira el anuncio completo para ganar tu boleto', 'error');
-        actualizarAdUI();
-        return;
-      }
-      btn.textContent = '⏳ Registrando boleto...';
-      const res = await fetch(BACKEND + '/api/ad-reward', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initData: tg ? tg.initData : '' })
-      });
+      try { await show_11964434(); }
+      catch (e) { cargandoAd = false; renderCTA(); haptic('warning'); return toast('Mira el anuncio completo para ganar tu boleto', 'err'); }
+      const res = await fetch(BACKEND + '/api/ad-reward', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg?.initData || '' }) });
       const data = await res.json();
+      cargandoAd = false;
       if (data.ok) {
-        adStatus.adsHoy = data.adsHoy;
-        adStatus.restantes = data.restantes;
-        actualizarAdUI();
-        mostrarToast('🎟 ¡Boleto #' + data.numero + ' obtenido!', 'success');
-        await cargarTodo();
+        ad.adsHoy = data.adsHoy; ad.restantes = data.restantes; ad.limite = data.limite || ad.limite;
+        arrancarEspera(data.cooldownSeg || 0);
+        ultimoNumero = data.numero; haptic('success');
+        boletos.push({ numero: data.numero, origen: 'ad' });
+        renderCTA(); renderMis(); $('pill-n').textContent = num(boletos.length);
+        $('pill').classList.remove('pop'); void $('pill').offsetWidth; $('pill').classList.add('pop');
+        celebrar(data.numero);
+        cargar(); // refresca progreso y datos reales
       } else {
-        mostrarToast(data.error || 'Error al registrar', 'error');
-        actualizarAdUI();
+        if (data.espera) arrancarEspera(data.espera);
+        if (data.error === 'Límite diario alcanzado') { ad.adsHoy = data.adsHoy; ad.restantes = 0; }
+        renderCTA(); haptic('error'); toast(data.error || 'No se pudo registrar el boleto', 'err');
       }
-    } catch (e) {
-      mostrarToast('Error de conexión. Intenta de nuevo', 'error');
-      actualizarAdUI();
-    }
+    } catch (e) { cargandoAd = false; renderCTA(); toast('Error de conexión. Inténtalo de nuevo', 'err'); }
   }
 
+  function celebrar(numero) {
+    const n = boletos.length, total = (sorteo.vendidos || 0) + 1, prob = (n / total * 100);
+    const ov = document.createElement('div'); ov.className = 'celebra';
+    ov.innerHTML = `<div class="box"><div class="t1">¡Boleto conseguido!</div><div class="num">#${numero}</div><div class="t2">Ya tienes <b>${num(n)}</b> ${n === 1 ? 'boleto' : 'boletos'} · <b>${prob < 10 ? prob.toFixed(1) : Math.round(prob)}%</b> de probabilidad</div><div class="t3">Toca para continuar</div></div>`;
+    document.body.appendChild(ov);
+    const cierre = () => { ov.remove(); document.querySelectorAll('.confeti').forEach(c => c.remove()); };
+    ov.onclick = cierre; setTimeout(cierre, 2600);
+    ['⭐', '🎟', '✨', '💰', '🎉'].forEach(e => { for (let i = 0; i < 4; i++) { const c = document.createElement('span'); c.className = 'confeti'; c.textContent = e; c.style.left = Math.random() * 96 + 'vw'; c.style.animationDelay = (Math.random() * .5) + 's'; c.style.animationDuration = (1.4 + Math.random()) + 's'; document.body.appendChild(c); setTimeout(() => c.remove(), 2600); } });
+  }
+
+  /* ───────── Otras acciones ───────── */
+  async function reclamarGratis() {
+    if (!userId) return toast('Abre la app desde Telegram', 'err');
+    const btn = $('btn-canal'); btn.disabled = true; btn.textContent = 'Verificando…';
+    try {
+      const res = await fetch(BACKEND + '/api/reclamar-gratis', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ initData: tg?.initData || '' }) });
+      const data = await res.json();
+      if (data.ok) { haptic('success'); ultimoNumero = data.numero; await cargar(); celebrar(data.numero); }
+      else if (data.noMiembro) { toast('Primero únete al canal y vuelve a tocar Reclamar', 'err'); abrirCanal(); renderMas(); }
+      else { toast(data.error || 'No disponible', 'err'); renderMas(); }
+    } catch (e) { toast('Error de conexión', 'err'); renderMas(); }
+  }
+
+  function compartir() {
+    const link = usuario?.linkReferido; if (!link) return toast('Abre la app desde Telegram', 'err');
+    const texto = '🎁 Gana dinero real viendo anuncios cortos. ¡Entra con mi link y participa gratis en el sorteo!';
+    const url = 'https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(texto);
+    tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url, '_blank');
+  }
   function copiarLink() {
-    if (linkReferido) {
-      navigator.clipboard.writeText(linkReferido).then(() => {
-        mostrarToast('¡Link copiado!', 'success');
-      });
-    }
+    const link = usuario?.linkReferido; if (!link) return;
+    (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => toast('¡Link copiado!', 'ok'), () => toast(link));
   }
 
-  function showTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
-    btn.classList.add('active');
-  }
-
-  function mostrarToast(msg, tipo) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.className = 'toast ' + tipo + ' show';
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
-
-  cargarTodo();
-
-// Auto-refresh cada 30 segundos
-setInterval(async () => {
-  try {
-    const res = await fetch(BACKEND + '/api/sorteo');
-    sorteoData = await res.json();
-    if (!sorteoData.error) renderSorteo();
-  } catch(e) {}
-}, 30000);
+  cargar();
+  setInterval(() => { if (sorteo?.fechaSorteo) renderHero(); }, 60000);
 </script>
 </body>
 </html>

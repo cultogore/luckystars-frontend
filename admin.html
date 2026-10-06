@@ -254,7 +254,8 @@ const medalla = i => MEDALLAS[i] || '🏅';
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const num = n => Number(n || 0).toLocaleString('es-MX');
-const usd = n => '$' + (Number(n) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usd = n => { n = Number(n) || 0; const a = Math.abs(n); const d = a === 0 || a >= 0.1 ? 2 : a >= 0.01 ? 3 : 4;
+  return (n < 0 ? '−' : '') + '$' + a.toLocaleString('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }); };
 const usdCorto = n => '$' + (Number.isInteger(+n) ? num(n) : (+n).toFixed(2));
 const fechaCorta = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : '—';
 const fechaLarga = iso => iso ? new Date(iso).toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' }) : '—';
@@ -405,6 +406,13 @@ function cuentaAtras(iso) {
   const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
   return d ? `en ${d} d ${h} h` : h ? `en ${h} h ${m % 60} min` : `en ${m} min`;
 }
+function ritmoTexto(sa) {
+  const ult = S.stats.boletosPorDia.slice(-3), prom = ult.reduce((t, d) => t + d.n, 0) / ult.length, falta = sa.metaBoletos - sa.vendidos;
+  if (falta <= 0) return '🎯 Meta alcanzada';
+  if (!prom) return '📈 Aún sin ritmo suficiente para estimar cuándo se llena';
+  const dias = falta / prom;
+  return `📈 Ritmo: ~${num(Math.round(prom))} boletos/día · se llena ${dias > 60 ? 'en más de 2 meses' : dias < 1 ? 'hoy' : 'en ~' + Math.ceil(dias) + ' días'}`;
+}
 function equilibrio(premiosUsd, cpm) { return cpm > 0 ? Math.ceil(premiosUsd / (cpm / 1000)) : null; }
 
 /* ── RESUMEN ── */
@@ -417,7 +425,7 @@ function renderResumen() {
   if (sa) {
     if (sa.porcentaje >= 90) alertas += `<div class="alert good"><span class="a-i">🔥</span><div>El sorteo está al <b>${sa.porcentaje}%</b>; se realizará solo al llegar a ${num(sa.metaBoletos)} boletos.</div></div>`;
     const eq = equilibrio(sa.premioTotalUsd, ing.cpmUsd);
-    if (eq && sa.metaBoletos < eq) alertas += `<div class="alert warn"><span class="a-i">📉</span><div>Con CPM de ${usd(ing.cpmUsd)}, los premios (${usd(sa.premioTotalUsd)}) cuestan más de lo que generan ${num(sa.metaBoletos)} anuncios. Necesitas ≈ <b>${num(eq)} boletos</b> para no perder. <button class="lnk" onclick="ir('sorteo')">Ajustar →</button></div></div>`;
+    if (eq && sa.metaBoletos < eq) alertas += `<div class="alert warn"><span class="a-i">📉</span><div>Con CPM de ${usd(ing.cpmUsd)}, los premios (${usd(sa.premioTotalUsd)}) cuestan más de lo que generarían ${num(sa.metaBoletos)} anuncios. Necesitas ≈ <b>${num(eq)} anuncios</b> para empatar. <button class="lnk" onclick="ir('sorteo')">Ajustar →</button></div></div>`;
   }
 
   const kpis = `<div class="kpis">
@@ -434,6 +442,7 @@ function renderResumen() {
     <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="muted">${num(sa.vendidos)} / ${num(sa.metaBoletos)} boletos</span><b class="gold">${sa.porcentaje}%</b></div>
     <div class="bar" style="margin-bottom:16px"><i style="width:${Math.min(100, sa.porcentaje)}%"></i></div>
     <div class="chips" style="margin-bottom:${sa.fechaSorteo ? 14 : 0}px">${sa.premios.map((p, i) => `<div class="chip"><div class="c-e">${medalla(i)}</div><div class="c-m gold">${usdCorto(p.montoUsd)} USD</div><div class="c-d">${esc(p.descripcion)}</div></div>`).join('')}</div>
+    <div class="muted" style="margin-bottom:${sa.fechaSorteo ? 8 : 0}px">${ritmoTexto(sa)}</div>
     ${sa.fechaSorteo ? `<div class="muted">⏰ Sorteo programado: <b style="color:var(--text)">${fechaLarga(sa.fechaSorteo)}</b> (${cuentaAtras(sa.fechaSorteo)})</div>` : ''}
   </div>` : '';
 
@@ -441,9 +450,9 @@ function renderResumen() {
     <div class="grid3" style="margin-bottom:6px">
       <div><div class="muted" style="font-size:12px">Ingresos 14 días</div><div style="font-size:22px;font-weight:800" class="green">${usd(ing.ultimos14Usd)}</div><div class="hint">${num(an.ultimos14)} anuncios</div></div>
       <div><div class="muted" style="font-size:12px">Premios del sorteo activo</div><div style="font-size:22px;font-weight:800" class="gold">${usd(ing.premiosSorteoUsd)}</div><div class="hint">${sa ? sa.premios.length + ' premio(s)' : '—'}</div></div>
-      <div><div class="muted" style="font-size:12px">Balance estimado</div><div style="font-size:22px;font-weight:800" class="${ing.gananciaEstimadaUsd >= 0 ? 'green' : 'red'}">${ing.gananciaEstimadaUsd === null ? '—' : (ing.gananciaEstimadaUsd >= 0 ? '+' : '−') + usd(Math.abs(ing.gananciaEstimadaUsd))}</div><div class="hint">ingresos 14 d − premios</div></div>
+      <div><div class="muted" style="font-size:12px">Balance estimado</div><div style="font-size:22px;font-weight:800" class="${ing.gananciaEstimadaUsd >= 0 ? 'green' : 'red'}">${ing.gananciaEstimadaUsd === null ? '—' : (ing.gananciaEstimadaUsd >= 0 ? '+' : '') + usd(ing.gananciaEstimadaUsd)}</div><div class="hint">ingresos 14 d − premios</div></div>
     </div>
-    <div class="hint">Estimación según el CPM configurado en Ajustes (${usd(ing.cpmUsd)}). Los ingresos reales están en tu panel de Monetag.</div></div>`;
+    <div class="hint">Cada anuncio genera ≈ <b>${usd(ing.cpmUsd / 1000)}</b> (CPM ${usd(ing.cpmUsd)}).${sa ? ` Cubrir los premios de este sorteo requiere ≈ <b>${num(equilibrio(sa.premioTotalUsd, ing.cpmUsd) || 0)}</b> anuncios.` : ''} Ajusta el CPM en Ajustes con el valor real de tu panel de Monetag.</div></div>`;
 
   const top = `<div class="card"><div class="card-h"><h2>🏅 Top participantes</h2></div>${s.top.length ? `<div class="tbl-wrap"><table style="min-width:0"><tbody>${s.top.map((u, i) => `<tr><td style="width:36px">${medalla(i)}</td><td class="u-n">${u.username ? '@' + esc(u.username) : 'ID ' + esc(u.userId)}</td><td style="text-align:right"><b>${num(u.boletos)}</b> <span class="muted">boletos</span></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Sin participantes aún</div>'}</div>`;
 
@@ -474,7 +483,7 @@ function renderSorteo() {
   const sa = S.stats.sorteoActivo, cfg = S.stats.config;
   S.draft = sa
     ? { titulo: sa.titulo, meta: sa.metaBoletos, fecha: localInput(sa.fechaSorteo), premios: sa.premios.map(p => ({ descripcion: p.descripcion, montoUsd: p.montoUsd })) }
-    : { titulo: '', meta: 1500, fecha: '', premios: [{ descripcion: '1er Premio', montoUsd: 2 }, { descripcion: '2do Premio', montoUsd: 1 }, { descripcion: '3er Premio', montoUsd: 0.5 }] };
+    : { titulo: '', meta: 10000, fecha: '', premios: [{ descripcion: '1er Premio', montoUsd: 1 }, { descripcion: '2do Premio', montoUsd: 0.5 }, { descripcion: '3er Premio', montoUsd: 0.25 }] };
   $('view').innerHTML = `
     ${sa ? `<div class="alert info"><span class="a-i">ℹ️</span><div>Hay un sorteo activo con <b>${num(sa.vendidos)}</b> boletos. Los cambios se aplican al instante. Para crear otro, primero realiza o cancela este.</div></div>`
          : `<div class="alert warn"><span class="a-i">⚠️</span><div>No hay sorteo activo. Crea uno para que los usuarios puedan ganar boletos.</div></div>`}
@@ -510,14 +519,20 @@ function addPremio() { if (S.draft.premios.length >= 10) return toast('Máximo 1
 function delPremio(i) { S.draft.premios.splice(i, 1); pintarPremios(); actualizarEstimador(); }
 function actualizarEstimador() {
   const total = S.draft.premios.reduce((t, p) => t + (parseFloat(p.montoUsd) || 0), 0);
-  const meta = parseInt($('f-meta').value, 10) || 0, cpm = S.stats.config.cpmUsd;
-  const ingreso = meta * cpm / 1000, bal = ingreso - total, eq = equilibrio(total, cpm);
+  const meta = parseInt($('f-meta').value, 10) || 0, cpm = S.stats.config.cpmUsd, porAd = cpm / 1000;
+  const ingreso = meta * porAd, bal = ingreso - total, eq = equilibrio(total, cpm);
+  const metaReco = porAd > 0 ? Math.ceil(total / (porAd * 0.5)) : null;
+  const maxPrem = ingreso * 0.5;
   $('premios-total').textContent = `Total en premios: ${usd(total)}`;
   $('estim').innerHTML = `
+    <div class="e-r"><span class="muted">Cada anuncio genera ≈ (CPM ${usd(cpm)})</span><b>${usd(porAd)}</b></div>
     <div class="e-r"><span class="muted">Costo total de premios</span><b class="gold">${usd(total)}</b></div>
-    <div class="e-r"><span class="muted">Ingreso estimado si se reparten ${num(meta)} boletos con anuncios (CPM ${usd(cpm)})</span><b class="green">${usd(ingreso)}</b></div>
-    <div class="e-r"><span class="muted">Balance estimado</span><b class="${bal >= 0 ? 'green' : 'red'}">${bal >= 0 ? '+' : '−'}${usd(Math.abs(bal))}</b></div>
-    ${eq ? `<div class="e-r"><span class="muted">Boletos necesarios para no perder dinero</span><b class="${meta >= eq ? 'green' : 'red'}">${num(eq)}</b></div>` : ''}
+    <div class="e-r"><span class="muted">Ingreso estimado al repartir ${num(meta)} boletos con anuncios</span><b class="green">${usd(ingreso)}</b></div>
+    <div class="e-r"><span class="muted">Balance estimado</span><b class="${bal >= 0 ? 'green' : 'red'}">${bal >= 0 ? '+' : ''}${usd(bal)}</b></div>
+    <div class="e-r"><span class="muted">Anuncios para cubrir los premios (empatar)</span><b class="${meta >= eq ? 'green' : 'red'}">${eq ? num(eq) : '—'}</b></div>
+    ${metaReco ? `<div class="e-r" style="align-items:center"><span class="muted">Meta recomendada (premios ≤ 50% de lo que generan)</span><span class="row" style="gap:8px;flex-wrap:nowrap"><b class="${metaReco <= 50000 ? 'gold' : 'red'}">${num(metaReco)}</b>${metaReco <= 50000 && metaReco !== meta ? `<button class="btn sm" type="button" onclick="$('f-meta').value=${metaReco};actualizarEstimador()">Usar</button>` : ''}</span></div>
+    <div class="e-r"><span class="muted">Premios máximos recomendados para esta meta</span><b>${usd(maxPrem)}</b></div>` : ''}
+    ${metaReco && metaReco > 50000 ? '<div class="hint" style="color:#fca5a5">⚠ Con estos premios ni 50,000 boletos dejan buen margen: baja los montos.</div>' : ''}
     <div class="hint" style="margin-top:6px">Estimación orientativa: los boletos por canal o referidos no generan anuncios.</div>`;
 }
 async function guardarSorteo(btn) {
@@ -671,10 +686,10 @@ function renderAjustes() {
   $('view').innerHTML = `
   <div class="card"><div class="card-h"><h2>📺 Anuncios y boletos</h2></div>
     <div class="grid2">
-      <div class="fld"><label class="lbl" for="c-lim">Anuncios por usuario al día</label><input class="input" id="c-lim" type="number" min="1" max="50" value="${c.adLimitDiario}"><div class="hint">Cada anuncio = 1 boleto. Más anuncios = más ingresos, pero sorteos que se llenan más rápido.</div></div>
+      <div class="fld"><label class="lbl" for="c-lim">Anuncios por usuario al día</label><input class="input" id="c-lim" type="number" min="1" max="50" value="${c.adLimitDiario}"><div class="hint">Cada anuncio = 1 boleto. Con un CPM bajo, subir el límite es la forma más directa de ganar más: cada usuario deja más ingresos al día (y el sorteo se llena antes).</div></div>
       <div class="fld"><label class="lbl" for="c-cool">Espera entre anuncios (segundos)</label><input class="input" id="c-cool" type="number" min="0" max="300" value="${c.cooldownSeg}"><div class="hint">Evita que alguien registre boletos sin ver el anuncio.</div></div>
     </div>
-    <div class="fld" style="max-width:340px"><label class="lbl" for="c-cpm">CPM estimado (USD por 1000 anuncios)</label><div class="money-in"><span>$</span><input class="input" id="c-cpm" type="number" min="0" step="0.1" value="${c.cpmUsd}"></div><div class="hint">Solo se usa para las estimaciones del panel. Mira tu CPM real en Monetag.</div></div>
+    <div class="fld" style="max-width:340px"><label class="lbl" for="c-cpm">CPM estimado (USD por 1000 anuncios)</label><div class="money-in"><span>$</span><input class="input" id="c-cpm" type="number" min="0" step="0.01" value="${c.cpmUsd}"></div><div class="hint">Solo se usa para las estimaciones del panel. En Telegram suele estar entre $0.20 y $0.50: cada anuncio vale ≈ $0.0003. Mira tu CPM real en Monetag.</div></div>
   </div>
   <div class="card"><div class="card-h"><h2>💬 Mensaje del bot</h2></div>
     <div class="fld"><label class="lbl" for="c-aviso">Aviso destacado en la bienvenida (opcional)</label><textarea class="input" id="c-aviso" maxlength="300" placeholder="Ej: ¡Este fin de semana sorteo extra!">${esc(c.avisoBienvenida)}</textarea><div class="hint">Aparece al final del mensaje de /start. Máx. 300 caracteres.</div></div>
